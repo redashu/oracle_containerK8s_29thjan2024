@@ -334,3 +334,36 @@ ashuc1
 ashuc1
 [ashu@docker-server ~]
 ```
+
+### creating container with custom process
+
+```
+[ashu@docker-server ~]$ docker  run -it -d --name ashuc2  alpine  date 
+6855f51f7ef4ff759a027dd6895bbdcbadafd2d9980b6b6950ed80ce2c05b23f
+
+
+[ashu@docker-server ~]$ docker  ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+[ashu@docker-server ~]$ 
+[ashu@docker-server ~]$
+
+
+[ashu@docker-server ~]$ docker  ps -a
+CONTAINER ID        IMAGE                COMMAND             CREATED             STATUS                      PORTS               NAMES
+6855f51f7ef4        alpine               "date"              16 seconds ago      Exited (0) 15 seconds ago                       ashuc2
+7d8e2aef532a        oraclelinux:9-slim   "/bin/bash"         15 minutes ago      Exited (0) 15 minutes ago                       charming_dubinsky
+[ashu@docker-server ~]$ 
+[ashu@docker-server ~]$
+
+[ashu@docker-server ~]$ docker  logs  ashuc2
+Mon Jan 29 07:15:04 UTC 2024
+[ashu@docker-server ~]$
+
+
+[ashu@docker-server ~]$ docker rm  ashuc2
+ashuc2
+[ashu@docker-server ~]$ 
+
+
+
+```
