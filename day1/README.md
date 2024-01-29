@@ -707,3 +707,62 @@ ashu@docker-server ashu-python]$ docker-compose down
 [ashu@docker-server ashu-python]$ 
 ```
 
+### adding more service to compose 
+
+```
+version:  '3.8'
+services: 
+  pythonashuapp: # name of service 
+    image: ashupyimg:v1  # image i want to build 
+    build: .  # location of Dockerfile 
+    container_name: ashupyc1 
+    tty: true # for logs purpose tty is required which is similar to -it 
+
+  pythontask: # app2 
+    image: ashutask:v1 
+    build: # have arugments 
+      context: .  # location 
+      dockerfile: task.dockerfile # name of dockerfile
+    container_name: ashupyc2 
+    tty: true  
+
+```
+
+### running ti
+
+```
+[ashu@docker-server ashu-python]$ docker-compose  up -d
+[+] Running 2/0
+ ✔ Container ashupyc1  Running                                                                                             0.0s 
+ ✔ Container ashupyc2  Running                                                                                             0.0s 
+[ashu@docker-server ashu-python]$ 
+[ashu@docker-server ashu-python]$ docker-compose  ps
+NAME       IMAGE          COMMAND                  SERVICE         CREATED         STATUS         PORTS
+ashupyc1   ashupyimg:v1   "python /ashucode/he…"   pythonashuapp   7 seconds ago   Up 7 seconds   
+ashupyc2   ashutask:v1    "python3 /code/while…"   pythontask      7 seconds ago   Up 7 seconds   
+[ashu@docker-server ashu-python]$ docker-compose  images
+CONTAINER           REPOSITORY          TAG                 IMAGE ID            SIZE
+ashupyc1            ashupyimg           v1                  46046ff97fbb        1.02GB
+ashupyc2            ashutask            v1                  ff91b1260725        56.1MB
+[ashu@docker-server ashu-python]$ 
+```
+
+### checking output 
+
+```
+[ashu@docker-server ashu-python]$ docker-compose  logs pythonashuapp
+ashupyc1  | Hello all , welcome to COntainer by Docker..!!
+ashupyc1  | Welcome to Oracle India ..
+ashupyc1  | this is ashutoshh singh ..!!
+```
+
+### cleaning up 
+
+```
+ashu@docker-server ashu-python]$ docker-compose  down 
+[+] Running 0/2
+ ⠴ Container ashupyc1  Stopping                                                                                            3.6s 
+ ⠴ Container ashupyc2  Stopping                                                                                            3.6s 
+
+```
+
