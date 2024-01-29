@@ -165,3 +165,172 @@ Server: Docker Engine - Community
   GitCommit:        fec3683
 
 ```
+
+### Docker images and containers 
+
+<img src="cnt1.png">
+
+### pulling images from docker hub 
+
+```
+[ashu@docker-server ~]$ whoami
+ashu
+[ashu@docker-server ~]$ docker  images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+[ashu@docker-server ~]$ 
+[ashu@docker-server ~]$ 
+[ashu@docker-server ~]$ docker  pull  alpine 
+Using default tag: latest
+Trying to pull repository docker.io/library/alpine ... 
+latest: Pulling from docker.io/library/alpine
+bca4290a9639: Pull complete 
+Digest: sha256:c5b1261d6d3e43071626931fc004f70149baeba2c8ec672bd4f27761f8e1ad6b
+Status: Downloaded newer image for alpine:latest
+alpine:latest
+[ashu@docker-server ~]$ 
+[ashu@docker-server ~]$ docker  images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+alpine              latest              ace17d5d883e        2 days ago          7.73MB
+[ashu@docker-server ~]$ 
+
+
+```
+
+### pulling python latest image
+
+```
+[ashu@docker-server ~]$ docker  pull python
+Using default tag: latest
+Trying to pull repository docker.io/library/python ... 
+latest: Pulling from docker.io/library/python
+5665c1f9a9e1: Pull complete 
+f419b1a62fc8: Pull complete 
+76b4f1810f99: Pull complete 
+1c176cbf6497: Pull complete 
+ba0d9396537e: Pull complete 
+f93cd5cfd8e8: Pull complete 
+cac9244624e2: Pull complete 
+84ab309da70c: Pull complete 
+Digest: sha256:a09f71f4af992ddf9a620330fed343c850c371251be45c3f9bb46ebeca49c9c6
+Status: Downloaded newer image for python:latest
+python:latest
+[ashu@docker-server ~]$ docker  images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+alpine              latest              ace17d5d883e        2 days ago          7.73MB
+python              latest              33039c2f184f        5 weeks ago         1.02GB
+
+```
+
+### Creating first container with default process
+
+```
+[ashu@docker-server ~]$ docker  run  --name  ashuc1  -it  -d   alpine:latest 
+ee8b471b6af84e007980650286461776d7007375e423c8113d861d17cf6ace4c
+
+
+[ashu@docker-server ~]$ docker  ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+ee8b471b6af8        alpine:latest       "/bin/sh"           3 seconds ago       Up 2 seconds                            ashuc1
+[ashu@docker-server ~]$ 
+
+
+```
+
+
+### checking resouce consumption of container 
+
+```
+docker  stats ashuc1
+CONTAINER ID        NAME                CPU %               MEM USAGE / LIMIT     MEM %               NET I/O             BLOCK I/O           PIDS
+ee8b471b6af8        ashuc1              0.00%               2.625MiB / 14.85GiB   0.02%               1.46kB / 0B         1.38MB / 0B         1
+^C
+
+```
+
+### to exit from above state -- use contr + c 
+
+### stop container and verify 
+
+```
+[ashu@docker-server ~]$ docker  stop  ashuc1
+ashuc1
+[ashu@docker-server ~]$ docker  ps
+CONTAINER ID        IMAGE                COMMAND             CREATED             STATUS              PORTS               NAMES
+99657f196402        alpine:latest        "/bin/sh"           2 minutes ago       Up 2 minutes                            sandhya1
+b66d6b47ca0e        oraclelinux:9-slim   "/bin/bash"         3 minutes ago       Up 3 minutes                            chinta_sunil
+30d31faf24f8        alpine:latest        "/bin/sh"           3 minutes ago       Up 3 minutes                            anant1
+13ee51ce341a        alpine               "/bin/sh"           4 minutes ago       Up 4 minutes                            sunil
+58d3dd491ed3        alpine:latest        "watch -n 5 ls"     5 minutes ago       Up 5 minutes                            dhara2
+baf9bd6f7224        alpine               "/bin/sh"           5 minutes ago       Up 5 minutes                            happy_greider
+3c262db87829        alpine:latest        "/bin/sh"           5 minutes ago       Up 5 minutes                            vishalc1
+8f1d9d4763d6        alpine:latest        "/bin/sh"           5 minutes ago       Up 5 minutes                            kash1
+6875c97197db        alpine               "/bin/sh"           5 minutes ago       Up 5 minutes                            rachana1
+2208a6d4a41e        alpine:latest        "/bin/sh"           7 minutes ago       Up 7 minutes                            prashanth1
+89aec282a3f8        alpine:latest        "/bin/sh"           7 minutes ago       Up 7 minutes                            dhara1
+[ashu@docker-server ~]$ 
+
+```
+
+### starting an exited container 
+
+```
+[ashu@docker-server ~]$ docker  ps  -a
+CONTAINER ID        IMAGE                COMMAND             CREATED             STATUS                            PORTS               NAMES
+99657f196402        alpine:latest        "/bin/sh"           3 minutes ago       Exited (137) 40 seconds ago                           sandhya1
+b66d6b47ca0e        oraclelinux:9-slim   "/bin/bash"         4 minutes ago       Exited (137) 10 seconds ago                           chinta_sunil
+30d31faf24f8        alpine:latest        "/bin/sh"           4 minutes ago       Exited (137) 34 seconds ago                           anant1
+af7d8abe2f45        oraclelinux:9-slim   "/bin/bash"         5 minutes ago       Exited (0) 5 minutes ago                              chinta
+13ee51ce341a        alpine               "/bin/sh"           5 minutes ago       Exited (137) 10 seconds ago                           sunil
+58d3dd491ed3        alpine:latest        "watch -n 5 ls"     5 minutes ago       Exited (137) 9 seconds ago                            dhara2
+baf9bd6f7224        alpine               "/bin/sh"           6 minutes ago       Up 6 minutes                                          happy_greider
+3c262db87829        alpine:latest        "/bin/sh"           6 minutes ago       Exited (137) 31 seconds ago                           vishalc1
+8f1d9d4763d6        alpine:latest        "/bin/sh"           6 minutes ago       Up 6 minutes                                          kash1
+6875c97197db        alpine               "/bin/sh"           6 minutes ago       Up 6 minutes                                          rachana1
+7d8e2aef532a        oraclelinux:9-slim   "/bin/bash"         7 minutes ago       Exited (0) 7 minutes ago                              charming_dubinsky
+17d1f2ea14c7        oraclelinux:7.9      "/bin/bash"         7 minutes ago       Exited (137) 59 seconds ago                           anant
+2208a6d4a41e        alpine:latest        "/bin/sh"           8 minutes ago       Exited (137) 47 seconds ago                           prashanth1
+89aec282a3f8        alpine:latest        "/bin/sh"           8 minutes ago       Exited (137) 22 seconds ago                           dhara1
+ee8b471b6af8        alpine:latest        "/bin/sh"           9 minutes ago       Exited (137) About a minute ago                       ashuc1
+[ashu@docker-server ~]$ 
+[ashu@docker-server ~]$ docker  start  ashuc1
+ashuc1
+[ashu@docker-server ~]$ docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+baf9bd6f7224        alpine              "/bin/sh"           6 minutes ago       Up 6 minutes                            happy_greider
+8f1d9d4763d6        alpine:latest       "/bin/sh"           7 minutes ago       Up 7 minutes                            kash1
+6875c97197db        alpine              "/bin/sh"           7 minutes ago       Up 7 minutes                            rachana1
+ee8b471b6af8        alpine:latest       "/bin/sh"           9 minutes ago       Up 2 seconds                            ashuc1
+[ashu@docker-server ~]$ 
+
+```
+
+### we can get shell access of a running container using exec 
+
+```
+[ashu@docker-server ~]$ docker   exec  -it  ashuc1  sh 
+/ # 
+/ # 
+/ # whoami
+root
+/ # ls
+bin    dev    etc    home   lib    media  mnt    opt    proc   root   run    sbin   srv    sys    tmp    usr    var
+/ # mkdir  helloashutoshh
+/ # ls
+bin             etc             home            media           opt             root            sbin            sys             usr
+dev             helloashutoshh  lib             mnt             proc            run             srv             tmp             var
+/ # exit
+[ashu@docker-server ~]$ 
+[ashu@docker-server ~]$ 
+[ashu@docker-server ~]$ 
+
+```
+
+### removing a contaienr 
+
+```
+[ashu@docker-server ~]$ docker  stop ashuc1
+ashuc1
+[ashu@docker-server ~]$ docker  rm  ashuc1
+ashuc1
+[ashu@docker-server ~]
+```
