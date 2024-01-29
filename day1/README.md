@@ -364,6 +364,107 @@ Mon Jan 29 07:15:04 UTC 2024
 ashuc2
 [ashu@docker-server ~]$ 
 
+```
 
+### application containerization -- using dockerfile 
+
+<img src="appc.png">
+
+## python script containerization 
+
+### hello.py code 
 
 ```
+import time
+
+while True:
+    print("Hello all , welcome to COntainer by Docker..!!")
+    time.sleep(3)
+    print("Welcome to Oracle India ..")
+    time.sleep(2)
+    print("this is ashutoshh singh ..!!")
+    print("______________________")
+    time.sleep(3)
+```
+
+### Dockerfile 
+
+```
+FROM python
+# we are trying to use python image from Docker hub 
+LABEL name=ashutoshh
+LABEL email=ashutoshh@linux.com 
+# label is optional keyword but used for sharing image creator info
+RUN mkdir /ashucode 
+# to run any command during image build time 
+COPY hello.py /ashucode/hello.py 
+# during build time my code is getting copied into image 
+CMD ["python","/ashucode/hello.py"]
+# to define default process of this image 
+
+```
+### building docker image 
+
+```
+[ashu@docker-server ashu-app-containerization]$ ls
+ashu-java  ashu-python
+[ashu@docker-server ashu-app-containerization]$ ls  ashu-python/
+Dockerfile  hello.py
+[ashu@docker-server ashu-app-containerization]$ ls
+ashu-java  ashu-python
+[ashu@docker-server ashu-app-containerization]$ docker  build  -t  ashupython:v1   ashu-python/ 
+Sending build context to Docker daemon  3.072kB
+Step 1/6 : FROM python
+ ---> 33039c2f184f
+Step 2/6 : LABEL name=ashutoshh
+ ---> Running in ef4fbd7075b7
+Removing intermediate container ef4fbd7075b7
+ ---> 2825f7fa6d36
+Step 3/6 : LABEL email=ashutoshh@linux.com
+ ---> Running in dcb1a6d68f53
+Removing intermediate container dcb1a6d68f53
+ ---> afd999596f52
+Step 4/6 : RUN mkdir /ashucode
+ ---> Running in ff58e46bb4d1
+Removing intermediate container ff58e46bb4d1
+ ---> ce18e4a4edb5
+Step 5/6 : COPY hello.py /ashucode/hello.py
+ ---> bc911bac571c
+Step 6/6 : CMD ["python","/ashucode/hello.py"]
+ ---> Running in d3c8c919bb7d
+Removing intermediate container d3c8c919bb7d
+ ---> 90fefe2036f0
+Successfully built 90fefe2036f0
+Successfully tagged ashupython:v1
+```
+
+### creating container and checking python code output 
+
+```
+[ashu@docker-server ashu-app-containerization]$ docker  run -itd  --name ashupyc1  ashupython:v1 
+110a0c008e86eeb878d6bb94ceb91667271db454cab2121d149bed4d5e58aaa6
+[ashu@docker-server ashu-app-containerization]$ docker  ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS               NAMES
+110a0c008e86        ashupython:v1       "python /ashucode/he…"   2 seconds ago       Up 1 second                             ashupyc1
+[ashu@docker-server ashu-app-containerization]$ docker logs  ashupyc1
+Hello all , welcome to COntainer by Docker..!!
+Welcome to Oracle India ..
+this is ashutoshh singh ..!!
+______________________
+Hello all , welcome to COntainer by Docker..!!
+[ashu@docker-server ashu-app-containerization]$ docker logs -f  ashupyc1
+Hello all , welcome to COntainer by Docker..!!
+Welcome to Oracle India ..
+this is ashutoshh singh ..!!
+______________________
+Hello all , welcome to COntainer by Docker..!!
+Welcome to Oracle India ..
+this is ashutoshh singh ..!!
+______________________
+Hello all , welcome to COntainer by Docker..!!
+Welcome to Oracle India ..
+this is ashutoshh singh ..!!
+______________________
+```
+
+
