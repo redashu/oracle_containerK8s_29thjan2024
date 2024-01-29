@@ -766,3 +766,40 @@ ashu@docker-server ashu-python]$ docker-compose  down
 
 ```
 
+### taking java code as example 
+
+## ashu.java 
+```
+class ashu { 
+    public static void main(String args[]) 
+    { 
+        // test expression 
+        while (true) { 
+            System.out.println("Hello ashutoshh"); 
+            try {
+                Thread.sleep(2000);
+            } catch (Exception ex) {
+                // Ignored
+            }
+  
+            // update expression 
+        } 
+    } 
+} 
+
+```
+
+### dockerfile
+
+```
+FROM openjdk 
+RUN mkdir /mycode 
+COPY ashu.java /mycode/
+WORKDIR /mycode
+# use of workdir is like cd command 
+RUN javac ashu.java 
+# compiling code
+CMD ["java","ashu"]
+```
+
+
