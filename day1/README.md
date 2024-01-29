@@ -661,4 +661,49 @@ services:
 
 ```
 
+### running compose file
+
+```
+[ashu@docker-server ashu-python]$ docker-compose  up -d
+[+] Running 0/1
+ ⠏ pythonashuapp Pulling                                                                                                   1.9s 
+[+] Building 33.2s (8/8) FINISHED                                                                                docker:default
+ => [pythonashuapp internal] load .dockerignore                                                                            0.0s
+ => => transferring context: 2B                                                                                            0.0s
+ => [pythonashuapp internal] load build definition from Dockerfile                                                         0.0s
+ => => transferring dockerfile: 630B
+
+[+] Running 1/2
+ ⠴ Network ashu-python_default  Created                                                                                    0.4s 
+ ✔ Container ashupyc1           Started                                                                                    0.3s 
+[ashu@docker-server ashu-python]$
+
+
+
+```
+
+### verify 
+
+```
+[ashu@docker-server ashu-python]$ docker-compose  ps
+NAME       IMAGE          COMMAND                  SERVICE         CREATED          STATUS          PORTS
+ashupyc1   ashupyimg:v1   "python /ashucode/he…"   pythonashuapp   53 seconds ago   Up 52 seconds   
+[ashu@docker-server ashu-python]$ 
+[ashu@docker-server ashu-python]$ 
+[ashu@docker-server ashu-python]$ docker-compose  logs pythonashuapp
+[ashu@docker-server ashu-python]$ 
+[ashu@docker-server ashu-python]$ docker-compose  images
+CONTAINER           REPOSITORY          TAG                 IMAGE ID            SIZE
+ashupyc1            ashupyimg           v1                  46046ff97fbb        1.02GB
+```
+
+### cleaning up
+
+```
+ashu@docker-server ashu-python]$ docker-compose down 
+[+] Running 2/2
+ ✔ Container ashupyc1           Removed                                                                                   10.2s 
+ ✔ Network ashu-python_default  Removed                                                                                    0.1s 
+[ashu@docker-server ashu-python]$ 
+```
 
