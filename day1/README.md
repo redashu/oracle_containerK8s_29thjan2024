@@ -629,3 +629,36 @@ bash-4.4$
 
 ```
 
+
+### task1  Solution 
+
+```
+FROM alpine 
+RUN apk add python3
+RUN mkdir /code
+ADD https://raw.githubusercontent.com/redashu/pythonLang/main/while.py /code/
+CMD ["python3","/code/while.py"]
+
+```
+
+### Introduction to docker compose 
+
+<img src="docker-compose.png">
+
+### info about docker-compose file 
+
+<img src="file.png">
+
+### adding docker-compose.yaml 
+
+```
+version:  '3.8'
+services: 
+  pythonashuapp: # name of service 
+    image: ashupyimg:v1  # image i want to build 
+    build: .  # location of Dockerfile 
+    container_name: ashupyc1 
+
+```
+
+
