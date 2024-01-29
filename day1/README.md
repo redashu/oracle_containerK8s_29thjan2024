@@ -484,5 +484,57 @@ ashupyc1
 
 ```
 
+### updating dockerfile to run python code without root user 
+
+### Dockerfile 
+```
+FROM python
+# we are trying to use python image from Docker hub 
+LABEL name=ashutoshh
+LABEL email=ashutoshh@linux.com 
+# label is optional keyword but used for sharing image creator info
+RUN mkdir /ashucode 
+# to run any command during image build time 
+COPY hello.py /ashucode/hello.py 
+USER 1001
+# above number is just user id in linux container which is for non root user 
+# range 1000-60000
+# during build time my code is getting copied into image 
+CMD ["python","/ashucode/hello.py"]
+# to define default process of this image 
+
+```
+
+### rebuild and recreate is required 
+
+```
+docker  build  -t  ashupython:rootlessv1    ashu-python/
+
+
+====>> Recreate
+
+[ashu@docker-server ashu-app-containerization]$ docker run -itd  --name ashupyc2   ashupython:rootlessv1 
+f921c76573a4704167aaaad142c4c5eec58feb93079114216be8396132c0bd0a
+[ashu@docker-server ashu-app-containerization]$ docker  ps
+CONTAINER ID        IMAGE                   COMMAND                  CREATED             STATUS              PORTS               NAMES
+f921c76573a4        ashupython:rootlessv1   "python /ashucode/he…"   2 seconds ago       Up 1 second                             ashupyc2
+eb17e3126a36        ashupython:v1           "python /ashucode/he…"   2 minutes ago       Up 2 minutes                            ashupyc1
+7702dad5cf49        paragpython:v1          "python /paragcode/h…"   8 minutes ago       Up 8 minutes                            paragpy1
+[ashu@docker-server ashu-app-containerization]$ docker logs ashupyc2
+Hello all , welcome to COntainer by Docker..!!
+Welcome to Oracle India ..
+this is ashutoshh singh ..!!
+______________________
+Hello all , welcome to COntainer by Docker..!!
+[ashu@docker-server ashu-app-containerization]$ docker  exec -it ashupyc2  bash 
+I have no name!@f921c76573a4:/$ 
+I have no name!@f921c76573a4:/$ 
+I have no name!@f921c76573a4:/$ whoami
+whoami: cannot find name for user ID 1001
+I have no name!@f921c76573a4:/$ id
+uid=1001 gid=0(root) groups=0(root)
+I have no name!@f921c76573a4:/$ 
+exit
+```
 
 
