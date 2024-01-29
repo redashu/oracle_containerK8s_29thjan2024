@@ -467,4 +467,22 @@ this is ashutoshh singh ..!!
 ______________________
 ```
 
+### more operations 
+
+```
+[ashu@docker-server ashu-app-containerization]$ docker  stop ashupyc1  
+ashupyc1
+[ashu@docker-server ashu-app-containerization]$ 
+[ashu@docker-server ashu-app-containerization]$ docker  start ashupyc1  
+ashupyc1
+[ashu@docker-server ashu-app-containerization]$ docker  kill  ashupyc1  
+ashupyc1
+[ashu@docker-server ashu-app-containerization]$ docker rm  ashupyc1
+ashupyc1
+[ashu@docker-server ashu-app-containerization]$ 
+
+
+```
+
+
 
