@@ -537,4 +537,95 @@ I have no name!@f921c76573a4:/$
 exit
 ```
 
+### Official python image size is 1GB -- lets try with oraclelinux image
+
+### dockerfile
+
+```
+FROM oraclelinux:8.4 
+# we are trying to use python image from Docker hub 
+LABEL name=ashutoshh
+LABEL email=ashutoshh@linux.com 
+# label is optional keyword but used for sharing image creator info
+RUN mkdir /ashucode 
+RUN dnf install python3 -y 
+# to run any command during image build time 
+COPY hello.py /ashucode/hello.py 
+USER 1001
+# above number is just user id in linux container which is for non root user 
+# range 1000-60000
+# during build time my code is getting copied into image 
+CMD ["python3","/ashucode/hello.py"]
+# to define default process of this image 
+
+```
+
+### build and test it 
+
+```
+ashu@docker-server ashu-app-containerization]$ ls
+ashu-java  ashu-python
+[ashu@docker-server ashu-app-containerization]$ cd  ashu-python/
+[ashu@docker-server ashu-python]$ ls
+Dockerfile  hello.py  oraclelinux.dockerfile
+[ashu@docker-server ashu-python]$ 
+[ashu@docker-server ashu-python]$ docker build -t ashupython:oraclelinux84  -f  oraclelinux.dockerfile  . 
+Sending build context to Docker daemon   5.12kB
+Step 1/8 : FROM oraclelinux:8.4
+ ---> 034c11d3a502
+Step 2/8 : LABEL name=ashutoshh
+ ---> Running in 215f4aa6f14f
+Removing intermediate container 215f4aa6f14f
+ ---> 33720b23c143
+Step 3/8 : LABEL email=ashutoshh@linux.com
+ ---> Running in 43b7261431d9
+Removing intermediate container 43b7261431d9
+ ---> 9600bfa29acf
+Step 4/8 : RUN mkdir /ashucode
+ ---> Running in a5baec9b3bd2
+Removing intermediate container a5baec9b3bd2
+ ---> 230a3fee3c5b
+Step 5/8 : RUN dnf install python3 -y
+ ---> Running in c984df9e8536
+Oracle Linux 8 BaseOS Latest (aarch64)          123 MB/s |  97 MB     00:00    
+
+
+
+
+```
+
+### testing and comparing 
+
+```
+[root@docker-server ~]# docker  images  | grep ashu
+ashupython          oraclelinux84       8e3500e20249        33 seconds ago      589MB
+ashupython          rootlessv1          3c348dffa175        16 minutes ago      1.02GB
+ashupython          v1                  90fefe2036f0        33 minutes ago      1.02GB
+[root@docker-server ~]# 
+[root@docker-server ~]# 
+[root@docker-server ~]# docker  run -itd --name ashupy  ashupython:oraclelinux84
+27c729f4ff3cafb7ec545de76dcde4f7843e355b06340cb69701c6b8ae6d08eb
+[root@docker-server ~]# docker  ps
+CONTAINER ID        IMAGE                      COMMAND                  CREATED             STATUS              PORTS               NAMES
+27c729f4ff3c        ashupython:oraclelinux84   "python3 /ashucode/h…"   2 seconds ago       Up 1 second                             ashupy
+0f0c20e34c08        sunil:v2                   "python main.py"         2 minutes ago       Up 2 minutes                            reverent_jepsen
+c2534ae9cad2        rachpython2:rootless       "python /rachcode/he…"   13 minutes ago      Up 13 minutes                           secondhellopython_rach
+e3e07b703da0        sandhyapyimg:v1            "python /sandhyacode…"   13 minutes ago      Up 13 minutes                           sandhyapyc2
+4a0ee634abbb        praspython1:rootlessv1     "python /prascode/he…"   15 minutes ago      Up 15 minutes                           praspyrootless
+7702dad5cf49        paragpython:v1             "python /paragcode/h…"   25 minutes ago      Up 25 minutes                           paragpy1
+[root@docker-server ~]# docker logs ashupy
+Hello all , welcome to COntainer by Docker..!!
+Welcome to Oracle India ..
+this is ashutoshh singh ..!!
+______________________
+Hello all , welcome to COntainer by Docker..!!
+[root@docker-server ~]# docker  exec -it ashupy bash 
+bash-4.4$ 
+bash-4.4$ 
+bash-4.4$ id
+uid=1001 gid=0(root) groups=0(root)
+bash-4.4$ 
+bash-4.4$ 
+
+```
 
