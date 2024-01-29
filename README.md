@@ -1,1 +1,8 @@
-# oracle_containerK8s_29thjan2024
+### Plan 
+
+<img src="plan.png">
+
+## tech stack 
+
+<img src="tech.png">
+
