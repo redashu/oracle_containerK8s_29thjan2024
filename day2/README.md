@@ -433,3 +433,48 @@ Removing login credentials for ap-mumbai-1.ocir.io
 [ashu@docker-server ashu-ui-app]$ 
 ```
 
+### solution of task container data copy 
+
+```
+[root@docker-server ~]# docker run -itd --name ashuc11  alpine 
+19d53ecd0bee254e82ee8d8d500e37058a8fca299d982506e93c844bc6086a65
+[root@docker-server ~]# docker run -itd --name ashuc22  alpine 
+98707d3b0a40cd9df446c30d79814fa5d777e3f60c5dc7ffe9f440a465e178a3
+[root@docker-server ~]# 
+[root@docker-server ~]# 
+[root@docker-server ~]# docker  exec -it  ashuc11 sh 
+/ # 
+/ # 
+/ # ls
+bin    dev    etc    home   lib    media  mnt    opt    proc   root   run    sbin   srv    sys    tmp    usr    var
+/ # pwd
+/
+/ # echo hello world >helloc1.txt
+/ # ls
+bin          etc          home         media        opt          root         sbin         sys          usr
+dev          helloc1.txt  lib          mnt          proc         run          srv          tmp          var
+/ # cat helloc1.txt 
+hello world
+/ # 
+/ # exit
+[root@docker-server ~]# 
+[root@docker-server ~]# docker  cp  ashuc11:/helloc1.txt   .
+[root@docker-server ~]# ls
+helloc1.txt  users.txt
+[root@docker-server ~]# docker  cp  helloc1.txt   ashuc22:/
+[root@docker-server ~]# docker  exec ashuc22 ls /
+bin
+dev
+etc
+helloc1.txt
+home
+lib
+media
+mnt
+opt
+proc
+
+```
+
+
+
