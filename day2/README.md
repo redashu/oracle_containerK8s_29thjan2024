@@ -476,5 +476,49 @@ proc
 
 ```
 
+## compose based solution 
+
+```
+version: '3.8'
+services:
+  ashusvc1:
+    image: alpine
+    tty: true
+    container_name: ashuc111
+  ashusvc2:
+    image: alpine
+    tty: true
+    container_name: ashuc222
+```
+### 
+
+```
+[ashu@docker-server tasks_ashu]$ docker-compose  up -d
+[+] Running 2/3
+ ⠴ Network tasks_ashu_default  Created                                                                   0.5s 
+ ✔ Container ashuc111          Started                                                                   0.4s 
+ ✔ Container ashuc222          Started                                                                   0.4s 
+[ashu@docker-server tasks_ashu]$ docker-compose  ps
+NAME       IMAGE     COMMAND     SERVICE    CREATED         STATUS         PORTS
+ashuc111   alpine    "/bin/sh"   ashusvc1   4 seconds ago   Up 3 seconds   
+ashuc222   alpine    "/bin/sh"   ashusvc2   4 seconds ago   Up 3 seconds   
+[ashu@docker-server tasks_ashu]$ docker-compose  exec ashusvc1  sh 
+/ # echo hellodata >helloc1.txt
+/ # ls
+bin          helloc1.txt  media        proc         sbin         tmp
+dev          home         mnt          root         srv          usr
+etc          lib          opt          run          sys          var
+/ # exit
+[ashu@docker-server tasks_ashu]$ docker-compose  cp ashusvc1:/helloc1.txt   . 
+[+] Copying 1/0
+ ✔ ashuc111 copy ashuc111:/helloc1.txt to . Copied                                                       0.0s 
+[ashu@docker-server tasks_ashu]$ ls
+compose.yaml  helloc1.txt
+[ashu@docker-server tasks_ashu]$ docker-compose  cp helloc1.txt ashusvc2:/ 
+[+] Copying 1/0
+ ✔ ashuc222 copy helloc1.txt to ashuc222:/ Copied                                                        0.0s 
+[ashu@docker-server tasks_ashu]$ 
+```
+
 
 
