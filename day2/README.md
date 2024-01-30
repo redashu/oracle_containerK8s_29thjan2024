@@ -321,3 +321,36 @@ NAME         IMAGE              COMMAND                  SERVICE             CRE
 ashujavac1   ashutomcat:appv1   "catalina.sh run"        ashu-java-project   2 minutes ago   Up 2 minutes   0.0.0.0:8899->8080/tcp
 ashuwebc1    ashunginx:appv1    "/docker-entrypoint.…"   ashu-ui-app         2 minutes ago   Up 2 minutes   0.0.0.0:1235->80/tcp
 ```
+
+### adding custom bridge name in docker-compose file 
+
+```
+version: '3.8'
+networks: # creating custom bridge by defining it 
+  ashubr1: # name of bridge 
+services:
+  ashu-java-project:
+    image: ashutomcat:appv1
+    build:
+      context: .
+      dockerfile: spring.dockerfile
+    container_name: ashujavac1 
+    networks:
+    - ashubr1 
+    ports:
+    - 8899:8080
+
+  ashu-ui-app:
+    image: ashunginx:appv1
+    build:
+      context: .
+      dockerfile: Dockerfile 
+    container_name: ashuwebc1 
+    networks:
+    - ashubr1
+    ports: # host port range you can use 1024 - 60k (we can use lower port also)
+    - 1235:80 # here left side is host port and right side is container port
+
+
+```
+
