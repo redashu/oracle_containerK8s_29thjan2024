@@ -520,5 +520,152 @@ compose.yaml  helloc1.txt
 [ashu@docker-server tasks_ashu]$ 
 ```
 
+### Intro to docker storage
+
+<img src="st1.png">
+
+### creating a docker volume 
+
+```
+[root@docker-server docker]# docker  volume  create  ashu-volume1
+ashu-volume1
+[root@docker-server docker]# 
+[root@docker-server docker]# 
+[root@docker-server docker]# docker  volume  ls
+DRIVER              VOLUME NAME
+local               ashu-volume1
+[root@docker-server docker]# 
+
+
+```
+
+### inspecting 
+
+```
+[root@docker-server docker]# docker volume inspect  ashu-volume1
+[
+    {
+        "CreatedAt": "2024-01-30T09:56:11Z",
+        "Driver": "local",
+        "Labels": {},
+        "Mountpoint": "/var/lib/docker/volumes/ashu-volume1/_data",
+        "Name": "ashu-volume1",
+        "Options": {},
+        "Scope": "local"
+    }
+]
+
+```
+
+### creating and using 
+
+```
+[root@docker-server docker]# docker  volume  ls
+DRIVER              VOLUME NAME
+local               anant-vol1
+local               ashu-volume1
+local               dhara-vol-1
+local               pras-vol1
+local               rachana-volume1
+local               sandhya-volume1
+local               vishalvol
+[root@docker-server docker]# 
+[root@docker-server docker]# 
+[root@docker-server docker]# docker  run -itd --name ashuc1   -v  ashu-volume1:/mnt/ashudata  alpine 
+ebbff1ace9aa2c0243a4332582d8090d4a918d5c10504081bb4be30d61e27d31
+[root@docker-server docker]# docker  ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+ebbff1ace9aa        alpine              "/bin/sh"           3 seconds ago       Up 3 seconds                            ashuc1
+[root@docker-server docker]# 
+[root@docker-server docker]# 
+[root@docker-server docker]# docker  exec -it ashuc1 sh 
+/ # cd /mnt/
+/mnt # ls
+ashudata
+/mnt # cd ashudata/
+/mnt/ashudata # ls
+/mnt/ashudata # mkdir hello world
+/mnt/ashudata # ls
+hello  world
+/mnt/ashudata # echo hello >fine.txt
+/mnt/ashudata # ls
+fine.txt  hello     world
+/mnt/ashudata # exit
+[root@docker-server docker]# docker rm ashuc1 -f
+ashuc1
+[root@docker-server docker]# 
+
+```
+
+### COmpose file to create docker volume | env | networki for mysql db image
+
+```
+version: '3.8'
+volumes: # creating volume 
+  ashu-vol2:  # name of volume 
+networks: # creating netowrk
+  ashu-br1:  # name of bridge 
+services:
+  ashu-db: 
+    image: mysql
+    container_name: ashudbc1 
+    networks:
+    - ashu-br1 
+    volumes: # mounting above created volume to container
+    - ashu-vol2:/var/lib/mysql/
+    environment: # calling env to set root user password for db 
+      MYSQL_ROOT_PASSWORD: HelloDocker@123
+
+```
+
+### run it
+
+```
+[ashu@docker-server ashu-db-app]$ docker-compose  up -d 
+[+] Running 1/3
+ ⠼ Network ashu-db-app_ashu-br1    Created                                                               0.5s 
+ ⠸ Volume "ashu-db-app_ashu-vol2"  Created                                                               0.3s 
+ ✔ Container ashudbc1              Started                                                               0.3s 
+[ashu@docker-server ashu-db-app]$ docker-compose  ps
+NAME       IMAGE     COMMAND                  SERVICE   CREATED         STATUS         PORTS
+ashudbc1   mysql     "docker-entrypoint.s…"   ashu-db   8 seconds ago   Up 7 seconds   3306/tcp, 33060/tcp
+[ashu@docker-server ashu-db-app]$ docker-compose  logs 
+ashudbc1  | 2024-01-30 10:09:56+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.3.0-1.el8 started.
+ashudbc1  | 2024-01-30 10:09:56+00:00 [Note] [Entrypoint]: Switching to dedicated user 'mysql'
+ashudbc1  | 2024-01-30 10:09:56+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.3.0-1.el8 started.
+ashudbc1  | 2024-01-30 10:09:57+00:00 [Note] [Entrypoint]: Initializing database files
+ashudbc1  | 2024-01-30T10:09:57.041900Z 0 [System] [MY-015017] [Server] MySQL Server Initialization - start.
+ashudbc1  | 2024-01-30T10:09:57.043145Z 0 [System] [MY-013169] [Server] /usr/sbin/mysqld (mysqld 8.3.0) initializing of server in progress as process 78
+ashudbc1  | 2024-01-30T10:09:57.052415Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+ashudbc1  | 2024-01-30T10:09:57.621260Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+ashudbc1  | 2024-01-30T10:09:59.443699Z 6 [Warning] [MY-010453] [Server] root@localhost is created with an empty password ! Please consider switching off the --initialize-insecure option.
+ashudbc1  | 2024-01-30T10:10:05.335233Z 0 [System] [MY-015018] [Server] MySQL Server Initialization - end.
+ashudbc1  | 2024-01-30 10:10:05+00:00 [Note] [Entrypoint]: Database files initialized
+ashudbc1  | 2024-01-30 10:10:05+00:00 [Note] [Entrypoint]: Starting temporary server
+ashudbc1  | 2024-01-30T10:10:05.386010Z 0 [System] [MY-015015] [Server] MySQL Server - start.
+ashudbc1  | 2024-01-30T10:10:05.529219Z 0 [System] [MY-010116] [Server] /usr/sbin/mysqld (mysqld 8.3.0) starting as process 120
+ashudbc1  | 2024-01-30T10:10:05.540480Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+ashudbc1  | 2024-01-30T10:10:05.719998Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+ashudbc1  | 2024-01-30T10:10:06.050265Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+ashudbc1  | 2024-01-30T10:10:06.050298Z 0 [System] [MY-013602] [Server] Channel mysql_main configured to support TLS. Encrypted connections are now supported for this channel.
+ashudbc1  | 2024-01-30T10:10:06.052697Z 0 [Warning] [MY-011810] [Server] Insecure configuration for --pid-file: Location '/var/run/mysqld' in the path is accessible to all OS users. Consider choosing a different directory.
+ashudbc1  | 2024-01-30T10:10:06.070709Z 0 [System] [MY-011323] [Server] X Plugin ready for connections. Socket: /var/run/mysqld/mysqlx.sock
+ashudbc1  | 2024-01-30T10:10:06.070940Z 0 [System] [MY-010931] [Server] /usr/sbin/mysqld: ready for connections. Version: '8.3.0'  socket: '/var/run/mysqld/mysqld.sock'  port: 0  MySQL Community Server - GPL.
+ashudbc1  | 2024-01-30 10:10:06+00:00 [Note] [Entrypoint]: Temporary server started.
+ashudbc1  | '/var/lib/mysql/mysql.sock' -> '/var/run/mysqld/mysqld.sock'
+ashudbc1  | Warning: Unable to load '/usr/share/zoneinfo/iso3166.tab' as time zone. Skipping it.
+ashudbc1  | Warning: Unable to load '/usr/share/zoneinfo/leap-seconds.list' as time zone. Skipping it.
+ashudbc1  | Warning: Unable to load '/usr/share/zoneinfo/leapseconds' as time zone. Skipping it.
+ashudbc1  | Warning: Unable to load '/usr/share/zoneinfo/tzdata.zi' as time zone. Skipping it.
+ashudbc1  | Warning: Unable to load '/usr/share/zoneinfo/zone.tab' as time zone. Skipping it.
+ashudbc1  | Warning: Unable to load '/usr/share/zoneinfo/zone1970.tab' as time zone. Skipping it.
+ashudbc1  | 
+ashudbc1  | 2024-01-30 10:10:09+00:00 [Note] [Entrypoint]: Stopping temporary server
+ashudbc1  | 2024-01-30T10:10:09.072422Z 10 [System] [MY-013172] [Server] Received SHUTDOWN from user root. Shutting down mysqld (Version: 8.3.0).
+ashudbc1  | 2024-01-30T10:10:10.808950Z 0 [System] [MY-010910] [Server] /usr/sbin/mysqld: Shutdown complete (mysqld 8.3.0)  MySQL Community Server - GPL.
+ashudbc1  | 2024-01-30T10:10:10.808974Z 0 [System] [MY-015016] [Server] MySQL Server - end.
+ashudbc1  | 2024-01-30 10:10:11+00:00 [Note] [Entrypoint]: Temporary server stopped
+```
+
 
 
