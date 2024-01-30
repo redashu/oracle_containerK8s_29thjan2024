@@ -696,4 +696,55 @@ services:
 
 ```
 
+### Creating webcontainer to consume database 
+
+```
+version: '3.8'
+volumes: # creating volume 
+  ashu-vol2:  # name of volume 
+networks: # creating netowrk
+  ashu-br1:  # name of bridge 
+services:
+  ashu-web: 
+    image: adminer # official docker image which can connect to any Db 
+    container_name: ashuwebc1 
+    networks:
+    - ashu-br1 
+    ports:
+    - 1235:8080 
+    depends_on: # this will wait for given service to be in ready state
+    - ashu-db 
+  ashu-db: 
+    image: mysql
+    container_name: $c_name 
+    networks:
+    - ashu-br1 
+    volumes: # mounting above created volume to container
+    - ashu-vol2:/var/lib/mysql/
+    environment: # calling env to set root user password for db 
+      MYSQL_ROOT_PASSWORD: $db_pass
+
+```
+
+### running it
+
+```
+[ashu@docker-server ashu-db-app]$ docker-compose  up -d 
+[+] Running 8/8
+ ✔ ashu-web 7 layers [⣿⣿⣿⣿⣿⣿⣿]      0B/0B      Pulled                                                    7.9s 
+   ✔ cf83973c4a09 Pull complete                                                                          1.3s 
+   ✔ f269d1e13e8a Pull complete                                                                          1.2s 
+   ✔ 771fefea0ccd Pull complete                                                                          0.7s 
+   ✔ e8139bb8fb2c Pull complete                                                                          1.3s 
+   ✔ 4841af3dd32c Pull complete                                                                          1.9s 
+   ✔ f0809dec229c Pull complete                                                                          2.0s 
+   ✔ e699d50432f2 Pull complete                                                                          2.0s 
+[+] Running 2/3
+ ⠏ Network ashu-db-app_ashu-br1  Created                                                                 2.9s 
+ ✔ Container ashuc1              Started                                                                 2.5s 
+ ✔ Container ashuwebc1           Started                                                                 0.6s 
+[ashu@docker-server ashu-db-app]$ 
+```
+
+
 
