@@ -667,5 +667,33 @@ ashudbc1  | 2024-01-30T10:10:10.808974Z 0 [System] [MY-015016] [Server] MySQL Se
 ashudbc1  | 2024-01-30 10:10:11+00:00 [Note] [Entrypoint]: Temporary server stopped
 ```
 
+### by default .env file is read by docker-compose 
+
+## .env
+```
+c_name=ashuc1
+db_pass=Hellodb@123
+```
+
+## compose.yaml
+
+```
+version: '3.8'
+volumes: # creating volume 
+  ashu-vol2:  # name of volume 
+networks: # creating netowrk
+  ashu-br1:  # name of bridge 
+services:
+  ashu-db: 
+    image: mysql
+    container_name: $c_name 
+    networks:
+    - ashu-br1 
+    volumes: # mounting above created volume to container
+    - ashu-vol2:/var/lib/mysql/
+    environment: # calling env to set root user password for db 
+      MYSQL_ROOT_PASSWORD: $db_pass
+
+```
 
 
