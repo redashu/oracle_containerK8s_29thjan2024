@@ -243,3 +243,81 @@ success
 [root@docker-server ~]# 
 
 ```
+
+### Multiple stage projects
+
+<img src="mul.png">
+
+### current workding directory strcture 
+
+```
+[ashu@docker-server ashu-ui-app]$ ls -a
+.  ..  ashu-walm-mvnweb  docker-compose.yaml  Dockerfile  .dockerignore  spring.dockerfile  vCard-personal-portfolio
+[ashu@docker-server ashu-ui-app]$ 
+
+
+```
+
+### spring.dockerfile
+
+```
+FROm oraclelinux:8.4  as Builder
+RUN dnf install java-11-openjdk.aarch64 java-11-openjdk-devel.aarch64 maven -y
+WORKDIR /mycode 
+# to create directory and change location also 
+COPY ashu-walm-mvnweb  .
+RUN mvn install 
+# above command will compile | test | create .war file under target ashuwebjava.war
+
+FROM tomcat 
+LABEL name=ashutoshh
+LABEL email=ashutoshh@linux.com 
+COPY --from=Builder  /mycode/target/ashuwebjava.war /usr/local/tomcat/webapps/
+
+```
+
+### docker-compose.yaml
+
+```
+version: '3.8'
+services:
+  ashu-java-project:
+    image: ashutomcat:appv1
+    build:
+      context: .
+      dockerfile: spring.dockerfile
+    container_name: ashujavac1 
+    ports:
+    - 8899:8080
+
+  ashu-ui-app:
+    image: ashunginx:appv1
+    build:
+      context: .
+      dockerfile: Dockerfile 
+    container_name: ashuwebc1 
+    ports: # host port range you can use 1024 - 60k (we can use lower port also)
+    - 1235:80 # here left side is host port and right side is container port
+
+
+```
+
+###  .dockerignore
+
+```
+vCard-personal-portfolio/.git
+vCard-personal-portfolio/index.txt
+vCard-personal-portfolio/README.md
+ashu-walm-mvnweb/.git
+ashu-walm-mvnweb/README.md
+```
+
+## Rebuild and test it 
+
+```
+docker-compose up -d --build
+[ashu@docker-server ashu-ui-app]$ docker-compose  ps
+NAME         IMAGE              COMMAND                  SERVICE             CREATED         STATUS         PORTS
+ashujavac1   ashutomcat:appv1   "catalina.sh run"        ashu-java-project   2 minutes ago   Up 2 minutes   0.0.0.0:8899->8080/tcp
+ashuwebc1    ashunginx:appv1    "/docker-entrypoint.…"   ashu-ui-app         2 minutes ago   Up 2 minutes   0.0.0.0:1235->80/tcp
+```
