@@ -102,3 +102,144 @@ docker-compose.yaml  Dockerfile  vCard-personal-portfolio
  ⠴ Network ashu-ui-app_default  Created                                                                                                             0.5s 
  ✔ Container ashuwebc1          Started                            
 ```
+
+### container networking 
+
+<img src="cnicnm.png">
+
+### checking default bridges in docker host
+
+```
+[ashu@docker-server ashu-ui-app]$ docker  network  ls
+NETWORK ID          NAME                DRIVER              SCOPE
+4db0af884895        bridge              bridge              local
+78ab40a4863f        host                host                local
+82c017b7df87        none                null                local
+
+
+[ashu@docker-server ashu-ui-app]$ docker  network  inspect  4db0af884895
+[
+    {
+        "Name": "bridge",
+        "Id": "4db0af884895f18aed46ce650a8ab2809cf7f057c274f0a5168691f99e97e199",
+        "Created": "2024-01-30T03:52:01.83798405Z",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": null,
+            "Config": [
+                {
+                    "Subnet": "172.17.0.0/16",
+                    "Gateway": "172.17.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {},
+        "Options": {
+            "com.docker.network.bridge.default_bridge": "true",
+            "com.docker.network.bridge.enable_icc": "true",
+            "com.docker.network.bridge.enable_ip_masquerade": "true",
+            "com.docker.network.bridge.host_binding_ipv4": "0.0.0.0",
+            "com.docker.network.bridge.name": "docker0",
+            "com.docker.network.driver.mtu": "1500"
+        },
+        "Labels": {}
+    }
+]
+```
+
+### testing other containers connecting 
+
+```
+[ashu@docker-server ashu-ui-app]$ docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED              STATUS              PORTS               NAMES
+5a7380d4a5fe        alpine              "/bin/sh"           45 seconds ago       Up 45 seconds                           sandhyac1
+54284cd77cb6        alpine              "/bin/sh"           About a minute ago   Up About a minute                       paragtest
+a20d8f84bdb8        alpine              "/bin/sh"           About a minute ago   Up About a minute                       rachnwtest
+35a869ea7038        alpine              "/bin/sh"           About a minute ago   Up About a minute                       anantc1
+6369c68e551a        alpine              "/bin/sh"           About a minute ago   Up About a minute                       vishalc1
+8a2995c2b86a        alpine              "/bin/sh"           2 minutes ago        Up About a minute                       prasc1
+a9d22921bd74        alpine              "/bin/sh"           2 minutes ago        Up 2 minutes                            dhara-c1
+d78fb8d61c47        alpine              "/bin/sh"           2 minutes ago        Up 2 minutes                            ashuc1
+[ashu@docker-server ashu-ui-app]$ docker  exec -it ashuc1  sh 
+/ # 
+/ # ping  172.17.0.6
+PING 172.17.0.6 (172.17.0.6): 56 data bytes
+64 bytes from 172.17.0.6: seq=0 ttl=64 time=0.163 ms
+64 bytes from 172.17.0.6: seq=1 ttl=64 time=0.082 ms
+^C
+--- 172.17.0.6 ping statistics ---
+2 packets transmitted, 2 packets received, 0% packet loss
+round-trip min/avg/max = 0.082/0.122/0.163 ms
+/ # 
+/ # exit
+```
+
+### container can access internet using host IP -- via NAT method 
+
+<img src="nat.png">
+
+### custom bridges and port forwarding 
+
+<img src="cb.png">
+
+### if we are using docker cli then port forwarding 
+
+```
+docker run -itd --name c1  -p 1234:80 ashunginx:appv1 
+```
+
+### adding port forwading in compose and rerun it 
+
+```
+version: '3.8'
+services:
+  ashu-ui-app:
+    image: ashunginx:appv1
+    build:
+      context: .
+      dockerfile: Dockerfile 
+    container_name: ashuwebc1 
+    ports: # host port range you can use 1024 - 60k (we can use lower port also)
+    - 1235:80 # here left side is host port and right side is container port
+
+
+```
+
+###
+
+```
+ashu@docker-server ashu-ui-app]$ docker-compose  up -d
+[+] Running 1/1
+ ✔ Container ashuwebc1  Started                                                                          0.3s 
+[ashu@docker-server ashu-ui-app]$ docker-compose  ps
+NAME        IMAGE             COMMAND                  SERVICE       CREATED         STATUS         PORTS
+ashuwebc1   ashunginx:appv1   "/docker-entrypoint.…"   ashu-ui-app   4 seconds ago   Up 4 seconds   0.0.0.0:1235->80/tcp
+[ashu@docker-server ashu-ui-app]$ 
+
+```
+
+### allow internal and external firewall rules 
+
+```
+[root@docker-server ~]# systemctl enable --now firewalld
+Created symlink from /etc/systemd/system/dbus-org.fedoraproject.FirewallD1.service to /usr/lib/systemd/system/firewalld.service.
+Created symlink from /etc/systemd/system/multi-user.target.wants/firewalld.service to /usr/lib/systemd/system/firewalld.service.
+[root@docker-server ~]# 
+[root@docker-server ~]# 
+[root@docker-server ~]# firewall-cmd  --add-port=1024-10000/tcp --permanent 
+success
+[root@docker-server ~]# firewall-cmd --reload 
+success
+[root@docker-server ~]# 
+
+```
