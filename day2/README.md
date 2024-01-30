@@ -403,4 +403,33 @@ a4f1b1145b2f: Pushed
 Removing login credentials for https://index.docker.io/v1/
 ```
 
+### pushing image to Oracle Container registry 
+
+```
+[ashu@docker-server ashu-ui-app]$  docker  tag   ashunginx:appv1  ap-mumbai-1.ocir.io/bmfqoyqvmham/oracleapps:version1 
+[ashu@docker-server ashu-ui-app]$ 
+[ashu@docker-server ashu-ui-app]$ docker login  ap-mumbai-1.ocir.io
+Username: bmfqoyqvmham/hvkataria12@gmail.com
+Password: 
+WARNING! Your password will be stored unencrypted in /home/ashu/.docker/config.json.
+Configure a credential helper to remove this warning. See
+https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+
+Login Succeeded
+[ashu@docker-server ashu-ui-app]$ docker  push  ap-mumbai-1.ocir.io/bmfqoyqvmham/oracleapps:version1
+The push refers to repository [ap-mumbai-1.ocir.io/bmfqoyqvmham/oracleapps]
+a4f1b1145b2f: Pushed 
+3aaeb64b961e: Pushed 
+13b225d31940: Pushed 
+cdaa6b69c4f7: Pushed 
+ba8df9f6e08a: Pushed 
+03f8fa0bab3f: Pushed 
+6831250ac8b4: Pushed 
+6f2d01c02c30: Pushed 
+version1: digest: sha256:741ba2e2cdd55fdbaf9154627bdfaf426dab9f4e358764d888f6ff7310104abf size: 1989
+[ashu@docker-server ashu-ui-app]$ 
+[ashu@docker-server ashu-ui-app]$ docker logout ap-mumbai-1.ocir.io
+Removing login credentials for ap-mumbai-1.ocir.io
+[ashu@docker-server ashu-ui-app]$ 
+```
 
