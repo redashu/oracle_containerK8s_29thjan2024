@@ -354,3 +354,53 @@ services:
 
 ```
 
+### Understanding registry 
+
+<img src="reg.png">
+
+### examples 
+
+<img src="reg1.png">
+
+### repository in registry
+
+<img src="reg2.png">
+
+## PUshing image to docker hub 
+
+### tagging 
+
+```
+docker  tag   ashunginx:appv1    docker.io/dockerashu/ashuoracletest:version1 
+```
+
+### login 
+
+```
+[ashu@docker-server ashu-ui-app]$ docker  login 
+Login with your Docker ID to push and pull images from Docker Hub. If you don't have a Docker ID, head over to https://hub.docker.com to create one.
+Username: dockerashu
+Password: 
+WARNING! Your password will be stored unencrypted in /home/ashu/.docker/config.json.
+Configure a credential helper to remove this warning. See
+https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+
+Login Succeeded
+```
+
+### push it
+
+```
+[ashu@docker-server ashu-ui-app]$ docker  push docker.io/dockerashu/ashuoracletest:version1
+The push refers to repository [docker.io/dockerashu/ashuoracletest]
+a4f1b1145b2f: Pushed 
+```
+
+### optional -- logout 
+
+```
+[ashu@docker-server ashu-ui-app]$ docker logout
+Removing login credentials for https://index.docker.io/v1/
+```
+
+
