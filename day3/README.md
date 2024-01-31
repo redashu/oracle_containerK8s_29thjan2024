@@ -376,5 +376,158 @@ anantpod-1   0/2     ContainerCreating   0          14s
 ashupod1     2/2     Running             0          26s
 [ashu@docker-server k8s-manifest]$ 
 
+```
 
+### accessing containers in multi container pod case 
+
+```
+ashu@docker-server k8s-manifest]$ kubectl  exec -it  ashupod1 -- sh 
+Defaulted container "ashuc2" out of: ashuc2, ashuc11
+/ # 
+/ # 
+/ # id
+uid=0(root) gid=0(root) groups=0(root),1(bin),2(daemon),3(sys),4(adm),6(disk),10(wheel),11(floppy),20(dialout),26(tape),27(video)
+/ # exit
+[ashu@docker-server k8s-manifest]$ 
+[ashu@docker-server k8s-manifest]$ kubectl  exec -it  ashupod1 -c ashuc11 -- bash  
+root@ashupod1:/# ls
+bin   dev                  docker-entrypoint.sh  home  lib32  libx32  mnt  proc  run   srv  tmp  var
+boot  docker-entrypoint.d  etc                   lib   lib64  media   opt  root  sbin  sys  usr
+root@ashupod1:/# exit
+exit
+```
+
+
+### autogenerate kubectl based manifest
+
+```
+[ashu@docker-server k8s-manifest]$ kubectl  run  ashupod2 --image=nginx  --port 80 --dry-run=client 
+pod/ashupod2 created (dry run)
+[ashu@docker-server k8s-manifest]$ kubectl  run  ashupod2 --image=nginx  --port 80 --dry-run=client  -o yaml 
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: ashupod2
+  name: ashupod2
+spec:
+  containers:
+  - image: nginx
+    name: ashupod2
+    ports:
+    - containerPort: 80
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+[ashu@docker-server k8s-manifest]$ kubectl  run  ashupod2 --image=nginx  --port 80 --dry-run=client  -o json 
+{
+    "kind": "Pod",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "ashupod2",
+        "creationTimestamp": null,
+        "labels": {
+            "run": "ashupod2"
+        }
+    },
+    "spec": {
+        "containers": [
+            {
+                "name": "ashupod2",
+                "image": "nginx",
+                "ports": [
+                    {
+                        "containerPort": 80
+                    }
+                ],
+                "resources": {}
+            }
+        ],
+        "restartPolicy": "Always",
+        "dnsPolicy": "ClusterFirst"
+```
+
+### 
+
+```
+171  kubectl  get pods
+  172  kubectl  run  ashupod2 --image=nginx  --port 80 --dry-run=client 
+  173  kubectl  run  ashupod2 --image=nginx  --port 80 --dry-run=client  -o yaml 
+  174  kubectl  run  ashupod2 --image=nginx  --port 80 --dry-run=client  -o json 
+  175  history 
+[ashu@docker-server k8s-manifest]$ 
+[ashu@docker-server k8s-manifest]$ 
+[ashu@docker-server k8s-manifest]$ kubectl  run  ashupod2 --image=nginx  --port 80 --dry-run=client  -o json >auto.json
+[ashu@docker-server k8s-manifest]$ 
+[ashu@docker-server k8s-manifest]$ kubectl  run  ashupod2 --image=nginx  --port 80 --dry-run=client  -o yaml >new.yaml
+[ashu@docker-server k8s-manifest]$ 
+[ashu@docker-server k8s-manifest]$ 
+[ashu@docker-server k8s-manifest]$ kubectl  create -f auto.json 
+pod/ashupod2 created
+[ashu@docker-server k8s-manifest]$ 
+[ashu@docker-server k8s-manifest]$ kubectl  get pods
+NAME       READY   STATUS    RESTARTS   AGE
+ashupod2   1/1     Running   0          8s
+[ashu@docker-server k8s-manifest]$ kubectl  delete -f auto.json 
+pod "ashupod2" deleted
+```
+
+### namespaces in k8s 
+
+<img src="k8sns.png">
+
+### there are 4 namesapces in k8s
+
+```
+[ashu@docker-server k8s-manifest]$ kubectl  get  namespaces
+NAME              STATUS   AGE
+default           Active   83m
+kube-node-lease   Active   83m
+kube-public       Active   83m
+kube-system       Active   83m
+[ashu@docker-server k8s-manifest]$ 
+```
+
+### Creating namespaces 
+
+```
+[ashu@docker-server k8s-manifest]$ kubectl  create  namespace  ashu-project  --dry-run=client -o yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  creationTimestamp: null
+  name: ashu-project
+spec: {}
+status: {}
+[ashu@docker-server k8s-manifest]$ kubectl  create  namespace  ashu-project 
+namespace/ashu-project created
+[ashu@docker-server k8s-manifest]$ 
+[ashu@docker-server k8s-manifest]$ kubectl  get namespaces
+NAME              STATUS   AGE
+ashu-project      Active   8s
+default           Active   86m
+kube-node-lease   Active   86m
+kube-public       Active   86m
+```
+
+### changing default namespace for my self
+
+```
+[ashu@docker-server k8s-manifest]$ kubectl config set-context --current --namespace ashu-project
+Context "context-c2qihrdomna" modified.
+[ashu@docker-server k8s-manifest]$ 
+[ashu@docker-server k8s-manifest]$ kubectl  get  pods
+No resources found in ashu-project namespace.
+```
+
+### checking default namespace
+
+```
+
+[ashu@docker-server k8s-manifest]$ kubectl  config get-contexts
+CURRENT   NAME                  CLUSTER               AUTHINFO           NAMESPACE
+*         context-c2qihrdomna   cluster-c2qihrdomna   user-c2qihrdomna   ashu-project
+[ashu@docker-server k8s-manifest]$ 
 ```
