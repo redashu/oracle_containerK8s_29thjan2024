@@ -548,3 +548,61 @@ ashufinal   1/1     Running   0          2m46s
 client      1/1     Running   0          8s
 [ashu@docker-server k8s-manifest]$ 
 ```
+
+### CNI - -COntainer network interface model 
+
+<img src="cni.png">
+
+### CNI options in k8s pod netowrking 
+
+<img src="podn.png">
+
+### ALL the pod in k8s cluster even from diff namespaces they can connect to each other 
+
+<img src="podn1.png">
+
+### testing
+
+```
+[ashu@docker-server k8s-manifest]$ kubectl  get  po -o wide
+NAME        READY   STATUS    RESTARTS   AGE   IP           NODE         NOMINATED NODE   READINESS GATES
+ashufinal   1/1     Running   0          47m   10.0.10.29   10.0.10.20   <none>           <none>
+client      1/1     Running   0          45m   10.0.10.8    10.0.10.20   <none>           <none>
+[ashu@docker-server k8s-manifest]$ 
+[ashu@docker-server k8s-manifest]$ 
+[ashu@docker-server k8s-manifest]$ 
+[ashu@docker-server k8s-manifest]$ kubectl  exec -it client -- sh 
+
+
+
+
+
+
+/ # 
+/ # 
+/ # curl http://10.0.10.29
+sh: curl: not found
+/ # apk add curl 
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.19/main/x86_64/APKINDEX.tar.gz
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.19/community/x86_64/APKINDEX.tar.gz
+(1/8) Installing ca-certificates (20230506-r0)
+(2/8) Installing brotli-libs (1.1.0-r1)
+(3/8) Installing c-ares (1.24.0-r1)
+(4/8) Installing libunistring (1.1-r2)
+(5/8) Installing libidn2 (2.3.4-r4)
+(6/8) Installing nghttp2-libs (1.58.0-r0)
+(7/8) Installing libcurl (8.5.0-r0)
+(8/8) Installing curl (8.5.0-r0)
+Executing busybox-1.36.1-r15.trigger
+Executing ca-certificates-20230506-r0.trigger
+OK: 12 MiB in 23 packages
+/ # 
+/ # 
+/ # curl http://10.0.10.29
+<!DOCTYPE HTML>
+<!--
+        Phantom by HTML5 UP
+```
+
+
+
