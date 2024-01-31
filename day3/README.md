@@ -261,3 +261,80 @@ PS C:\Users\hp\Desktop\k8s-manifest>
 PS C:\Users\hp\Desktop\k8s-manifest> kubectl  delete pod  ashupod-1
 pod "ashupod-1" deleted
 ```
+
+### default llocation from where kubectl read k8s cred 
+
+<img src="kubeconfig.png">
+
+### demo in windows 
+
+```
+sers\hp>
+PS C:\Users\hp> kubectl get nodes
+NAME              STATUS   ROLES                  AGE    VERSION
+desktop-52f5653   Ready    control-plane,master   287d   v1.26.3+k3s1
+PS C:\Users\hp>
+PS C:\Users\hp>
+PS C:\Users\hp> cd .kube
+PS C:\Users\hp\.kube> ls
+
+
+    Directory: C:\Users\hp\.kube
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d-----          6/9/2023   6:14 AM                cache
+-a----         1/30/2024   8:26 PM           8721 config
+
+
+PS C:\Users\hp\.kube>
+```
+
+### mac users 
+
+```
+ ~ cd  ~/.kube
+➜  .kube ls
+cache  config
+➜  .kube cat config 
+apiVersion: v1
+clusters:
+
+```
+
+### connecting to OKE 
+
+<img src="oke.png">
+
+### in linux vm configure OKE cred 
+
+```
+[ashu@docker-server ashu-app-containerization]$ mkdir  ~/.kube 
+[ashu@docker-server ashu-app-containerization]$ mkdir  ~/.oci
+[ashu@docker-server ashu-app-containerization]$ cp -v  /tmp/config  ~/.kube/
+‘/tmp/config’ -> ‘/home/ashu/.kube/config’
+[ashu@docker-server ashu-app-containerization]$ ls -l ~/.kube/
+total 4
+-rw-r--r--. 1 ashu ashu 2370 Jan 31 09:01 config
+[ashu@docker-server ashu-app-containerization]$ 
+
+
+### Downlaod oci detaisl
+
+ cp -v /tmp/.oci/*   ~/.oci/
+
+chmod  600 ~/.oci/config
+ chmod  600 ~/.oci/oci_api_key.pem 
+```
+### checking kubectl to get nodes
+
+```
+kubectl  get nodes
+NAME          STATUS   ROLES   AGE   VERSION
+10.0.10.192   Ready    node    53m   v1.28.2
+10.0.10.20    Ready    node    53m   v1.28.2
+10.0.10.238   Ready    node    53m   v1.28.2
+[ashu@docker-server ashu-app-containerization]$ 
+```
+
