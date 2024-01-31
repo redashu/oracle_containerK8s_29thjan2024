@@ -338,3 +338,43 @@ NAME          STATUS   ROLES   AGE   VERSION
 [ashu@docker-server ashu-app-containerization]$ 
 ```
 
+### Creating multi container pod 
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ashupod1 
+spec:
+  containers:
+  - name: ashuc2 
+    image: alpine 
+    command: ["ping","fb.com"]
+  - name: ashuc11
+    image: nginx 
+    ports:
+    - containerPort: 80 
+```
+
+### 
+
+```
+[ashu@docker-server ashu-app-containerization]$ ls
+ashu-db-app  ashu-env  ashu-java  ashu-python  ashu-ui-app  k8s-manifest  tasks_ashu
+[ashu@docker-server ashu-app-containerization]$ cd  k8s-manifest/
+[ashu@docker-server k8s-manifest]$ ls
+ashupod1.yaml
+[ashu@docker-server k8s-manifest]$ kubectl  create -f ashupod1.yaml 
+pod/ashupod1 created
+[ashu@docker-server k8s-manifest]$ kubectl  get  pods
+NAME         READY   STATUS              RESTARTS   AGE
+anantpod-1   0/2     ContainerCreating   0          1s
+ashupod1     0/2     ContainerCreating   0          13s
+[ashu@docker-server k8s-manifest]$ kubectl  get  pods
+NAME         READY   STATUS              RESTARTS   AGE
+anantpod-1   0/2     ContainerCreating   0          14s
+ashupod1     2/2     Running             0          26s
+[ashu@docker-server k8s-manifest]$ 
+
+
+```
