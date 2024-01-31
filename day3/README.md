@@ -531,3 +531,20 @@ CURRENT   NAME                  CLUSTER               AUTHINFO           NAMESPA
 *         context-c2qihrdomna   cluster-c2qihrdomna   user-c2qihrdomna   ashu-project
 [ashu@docker-server k8s-manifest]$ 
 ```
+
+### OKE -- AMD processor based images 
+
+```
+[ashu@docker-server k8s-manifest]$ kubectl  run ashufinal --image=ap-mumbai-1.ocir.io/bmfqoyqvmham/trainingapp:nginxamd
+pod/ashufinal created
+[ashu@docker-server k8s-manifest]$ kubectl  get pod
+NAME        READY   STATUS    RESTARTS   AGE
+ashufinal   1/1     Running   0          8s
+[ashu@docker-server k8s-manifest]$ kubectl  run client --image=ap-mumbai-1.ocir.io/bmfqoyqvmham/trainingapp:alpineamd --command sleep 40000
+pod/client created
+[ashu@docker-server k8s-manifest]$ kubectl  get pods
+NAME        READY   STATUS    RESTARTS   AGE
+ashufinal   1/1     Running   0          2m46s
+client      1/1     Running   0          8s
+[ashu@docker-server k8s-manifest]$ 
+```
