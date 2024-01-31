@@ -80,4 +80,54 @@ PS C:\Users\hp>
 
 <img src="etcd.png">
 
+## Deploy application in kuberntes
+
+### Intro to pods 
+
+<img src="pods.png">
+
+### setup vscode to write pod manifest file  and checking pods 
+
+```
+PS C:\Users\hp\Desktop\k8s-manifest> kubectl get  nodes
+NAME              STATUS   ROLES                  AGE    VERSION     
+desktop-52f5653   Ready    control-plane,master   287d   v1.26.3+k3s1
+PS C:\Users\hp\Desktop\k8s-manifest> 
+PS C:\Users\hp\Desktop\k8s-manifest> 
+PS C:\Users\hp\Desktop\k8s-manifest> kubectl  get  pods
+No resources found in default namespace.
+PS C:\Users\hp\Desktop\k8s-manifest> 
+
+```
+
+
+## compose vs k8s manifest 
+
+<img src="k8smanifest.png">
+
+### first Pod manifeset 
+
+```
+apiVersion: v1 # targeting k8s control plane APiversion on apiversion v1 
+kind: Pod 
+metadata: # info about kind 
+  name: ashupod-1 
+spec: # info about application 
+  containers:
+  - name: ashuc1 
+    image: nginx  # image from docker hub 
+    ports: # appllication port 
+    - containerPort: 80 
+
+```
+
+### deploy it 
+
+```
+PS C:\Users\hp\Desktop\k8s-manifest> kubectl  create  -f  ashupod1.yaml
+pod/ashupod-1 created
+PS C:\Users\hp\Desktop\k8s-manifest> kubectl get  pods
+NAME        READY   STATUS              RESTARTS   AGE
+ashupod-1   0/1     ContainerCreating   0          35s
+```
 
