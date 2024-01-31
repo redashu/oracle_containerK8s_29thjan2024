@@ -131,3 +131,133 @@ NAME        READY   STATUS              RESTARTS   AGE
 ashupod-1   0/1     ContainerCreating   0          35s
 ```
 
+### chekcing more details about pod 
+
+```
+PS C:\Users\hp\Desktop\k8s-manifest> kubectl.exe  get  pods
+NAME        READY   STATUS    RESTARTS   AGE  
+ashupod-1   1/1     Running   0          2m37s
+PS C:\Users\hp\Desktop\k8s-manifest> 
+PS C:\Users\hp\Desktop\k8s-manifest> 
+PS C:\Users\hp\Desktop\k8s-manifest> kubectl.exe  get  pods -o wide
+NAME        READY   STATUS    RESTARTS   AGE     IP           NODE              NOMINATED NODE   READINESS GATES
+ashupod-1   1/1     Running   0          2m42s   10.42.0.24   desktop-52f5653   <none>           <none>
+PS C:\Users\hp\Desktop\k8s-manifest> kubectl.exe get nodes
+NAME              STATUS   ROLES                  AGE    VERSION     
+desktop-52f5653   Ready    control-plane,master   287d   v1.26.3+k3s1
+PS C:\Users\hp\Desktop\k8s-manifest> 
+
+
+```
+
+### more pod specific commands
+
+```
+PS C:\Users\hp\Desktop\k8s-manifest> kubectl get  pods             
+NAME        READY   STATUS    RESTARTS   AGE
+ashupod-1   1/1     Running   0          14m
+PS C:\Users\hp\Desktop\k8s-manifest> 
+PS C:\Users\hp\Desktop\k8s-manifest> kubectl get  pods -o wide
+NAME        READY   STATUS    RESTARTS   AGE   IP           NODE              NOMINATED NODE   READINESS GATES
+ashupod-1   1/1     Running   0          14m   10.42.0.24   desktop-52f5653   <none>           <none>
+PS C:\Users\hp\Desktop\k8s-manifest> 
+PS C:\Users\hp\Desktop\k8s-manifest> kubectl.exe  describe pod ashupod-1 
+Name:             ashupod-1
+Namespace:        default
+Priority:         0
+Service Account:  default
+Node:             desktop-52f5653/172.24.73.34
+Start Time:       Tue, 30 Jan 2024 22:40:27 -0800
+Labels:           <none>
+Annotations:      <none>
+Status:           Running
+IP:               10.42.0.24
+IPs:
+  IP:  10.42.0.24
+Containers:
+  ashuc1:
+    Container ID:   docker://3e69aaacb611f50bf6d8cb9629c1f1e9eebb625d710b2e0de1fbde3ed3af92c8
+    Image:          nginx
+    Image ID:       docker-pullable://nginx@sha256:4c0fdaa8b6341bfdeca5f18f7837462c80cff90527ee35ef185571e1c327beac
+    Port:           80/TCP
+    Host Port:      0/TCP
+    State:          Running
+      Started:      Tue, 30 Jan 2024 22:41:21 -0800
+    Ready:          True
+    Restart Count:  0
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-w824v (ro)
+Conditions:
+  Type              Status
+  Initialized       True
+  Ready             True
+  ContainersReady   True
+  PodScheduled      True
+Volumes:
+  kube-api-access-w824v:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+QoS Class:                   BestEffort
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age   From               Message
+  ----    ------     ----  ----               -------
+  Normal  Scheduled  14m   default-scheduler  Successfully assigned default/ashupod-1 to desktop-52f5653
+  Normal  Pulling    14m   kubelet            Pulling image "nginx"
+  Normal  Pulled     14m   kubelet            Successfully pulled image "nginx" in 48.2486111s (48.2487231s including waiting)
+  Normal  Created    14m   kubelet            Created container ashuc1
+  Normal  Started    14m   kubelet            Started container ashuc1
+```
+
+### checking logs of pod 
+
+```
+PS C:\Users\hp\Desktop\k8s-manifest> kubectl logs ashupod-1 
+/docker-entrypoint.sh: /docker-entrypoint.d/ is not empty, will attempt to perform configuration
+/docker-entrypoint.sh: Looking for shell scripts in /docker-entrypoint.d/
+/docker-entrypoint.sh: Launching /docker-entrypoint.d/10-listen-on-ipv6-by-default.sh
+10-listen-on-ipv6-by-default.sh: info: Getting the checksum of /etc/nginx/conf.d/default.conf  
+10-listen-on-ipv6-by-default.sh: info: Enabled listen on IPv6 in /etc/nginx/conf.d/default.conf
+/docker-entrypoint.sh: Sourcing /docker-entrypoint.d/15-local-resolvers.envsh
+/docker-entrypoint.sh: Launching /docker-entrypoint.d/20-envsubst-on-templates.sh
+/docker-entrypoint.sh: Launching /docker-entrypoint.d/30-tune-worker-processes.sh
+/docker-entrypoint.sh: Configuration complete; ready for start up
+2024/01/31 06:41:21 [notice] 1#1: using the "epoll" event method
+2024/01/31 06:41:21 [notice] 1#1: nginx/1.25.3
+2024/01/31 06:41:21 [notice] 1#1: built by gcc 12.2.0 (Debian 12.2.0-14)
+2024/01/31 06:41:21 [notice] 1#1: OS: Linux 5.10.16.3-microsoft-standard-WSL2
+```
+
+### access container inside pod 
+
+```
+PS C:\Users\hp\Desktop\k8s-manifest> kubectl get po 
+NAME        READY   STATUS    RESTARTS   AGE
+ashupod-1   1/1     Running   0          17m
+PS C:\Users\hp\Desktop\k8s-manifest> 
+PS C:\Users\hp\Desktop\k8s-manifest> kubectl exec -it ashupod-1 -- bash 
+root@ashupod-1:/#
+root@ashupod-1:/# 
+root@ashupod-1:/# 
+root@ashupod-1:/# id
+uid=0(root) gid=0(root) groups=0(root)
+root@ashupod-1:/# ls
+bin   dev                  docker-entrypoint.sh  home  lib32  libx32  mnt  proc  run   srv  tmp  var
+boot  docker-entrypoint.d  etc                   lib   lib64  media   opt  root  sbin  sys  usr     
+root@ashupod-1:/# exit
+exit
+PS C:\Users\hp\Desktop\k8s-manifest> 
+```
+
+### deleting pod
+
+```
+PS C:\Users\hp\Desktop\k8s-manifest> kubectl  delete pod  ashupod-1
+pod "ashupod-1" deleted
+```
