@@ -281,3 +281,49 @@ ashupod1   1/1     Running   0          8m1s   10.244.1.13   aks-agentpool-31845
 [ashu@ip-172-31-29-23 k8s-manifest]$ 
 
 ```
+
+### Understnading cloud controller in k8s 
+
+<img src="cc.png">
+
+### clusterIP to Loadbalancer type svc
+
+```
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashulb1
+  name: ashulb1 # name of internal LB 
+spec:
+  ports:
+  - name: 1234-80
+    port: 1234
+    protocol: TCP
+    targetPort: 80
+  selector: # they way internal will be finding pod IP in svc discovery DB 
+    #app: ashulb1
+    x1: ashuwebapp # label of pods 
+  type: LoadBalancer # type of service 
+status:
+  loadBalancer: {}
+
+```
+
+### apply changes
+
+```
+ashu@ip-172-31-29-23 k8s-manifest]$ kubectl  create  -f  clustersvc.yaml 
+Error from server (AlreadyExists): error when creating "clustersvc.yaml": services "ashulb1" already exists
+[ashu@ip-172-31-29-23 k8s-manifest]$ 
+[ashu@ip-172-31-29-23 k8s-manifest]$ 
+[ashu@ip-172-31-29-23 k8s-manifest]$ kubectl apply   -f  clustersvc.yaml 
+Warning: resource services/ashulb1 is missing the kubectl.kubernetes.io/last-applied-configuration annotation which is required by kubectl apply. kubectl apply should only be used on resources created declaratively by either kubectl create --save-config or kubectl apply. The missing annotation will be patched automatically.
+service/ashulb1 configured
+[ashu@ip-172-31-29-23 k8s-manifest]$ kubectl  get  service 
+NAME      TYPE           CLUSTER-IP     EXTERNAL-IP     PORT(S)          AGE
+ashulb1   LoadBalancer   10.0.198.148   20.235.194.19   1234:31248/TCP   15m
+[ashu@ip-172-31-29-23 k8s-manifest]$ 
+```
+
