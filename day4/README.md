@@ -186,3 +186,98 @@ ashupod1   1/1     Running   0          8s
 
 <img src="lb1.png">
 
+### incase to change label of pod 
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels: # this is label of my pod 
+    x1: ashuwebapp # here run is key and ashupod1 is value 
+  name: ashupod1
+spec:
+  containers:
+  - image: dockerashu/ashu-oraclewebapp:linuxamdv1
+    name: ashupod1
+    ports:
+    - containerPort: 80
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+
+```
+
+### replacing pod 
+
+```
+ashu@ip-172-31-29-23 k8s-manifest]$ kubectl  replace -f podweb.yaml  --force
+pod "ashupod1" deleted
+pod/ashupod1 replaced
+[ashu@ip-172-31-29-23 k8s-manifest]$ kubectl  get po 
+NAME       READY   STATUS    RESTARTS   AGE
+ashupod1   1/1     Running   0          9s
+[ashu@ip-172-31-29-23 k8s-manifest]$ kubectl  get po  --show-labels
+NAME       READY   STATUS    RESTARTS   AGE   LABELS
+ashupod1   1/1     Running   0          17s   x1=ashuwebapp
+[ashu@ip-172-31-29-23 k8s-manifest]$ 
+```
+
+### Creating internal LB using service Resource type 
+
+<img src="svc11.png">
+
+### ClusterIP type service Create 
+
+```
+kubectl  create  service   clusterip   ashulb1  --tcp  1234:80  --dry-run=client -o yaml >clustersvc.yaml 
+```
+
+### modify service yaml 
+
+```
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashulb1
+  name: ashulb1 # name of internal LB 
+spec:
+  ports:
+  - name: 1234-80
+    port: 1234
+    protocol: TCP
+    targetPort: 80
+  selector: # they way internal will be finding pod IP in svc discovery DB 
+    #app: ashulb1
+    x1: ashuwebapp # label of pods 
+  type: ClusterIP # type of service 
+status:
+  loadBalancer: {}
+
+```
+
+### send create request to apiserver
+
+```
+[ashu@ip-172-31-29-23 k8s-manifest]$ 
+[ashu@ip-172-31-29-23 k8s-manifest]$ kubectl create -f clustersvc.yaml 
+service/ashulb1 created
+[ashu@ip-172-31-29-23 k8s-manifest]$ kubectl  get  service 
+NAME      TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
+ashulb1   ClusterIP   10.0.198.148   <none>        1234/TCP   5s
+[ashu@ip-172-31-29-23 k8s-manifest]$
+
+
+[ashu@ip-172-31-29-23 k8s-manifest]$ kubectl  get  ep
+NAME      ENDPOINTS        AGE
+ashulb1   10.244.1.13:80   26s
+
+[ashu@ip-172-31-29-23 k8s-manifest]$ kubectl  get po -o wide
+NAME       READY   STATUS    RESTARTS   AGE    IP            NODE                                NOMINATED NODE   READINESS GATES
+ashupod1   1/1     Running   0          8m1s   10.244.1.13   aks-agentpool-31845344-vmss000000   <none>           <none>
+[ashu@ip-172-31-29-23 k8s-manifest]$ 
+
+```
