@@ -757,4 +757,18 @@ spec:
 status: {}
 ```
 
+### adding service yaml in same file 
+
+```
+ kubectl expose deployment ashu-mysqldb --type ClusterIP --port 3306 --name db-lb --dry-run=client  -o yaml 
+  204  kubectl apply -f ashu-two-tierapp.yaml 
+  205  kubectl  get  svc
+  206  kubectl  get  ep 
+```
+
+### Ingress controller in k8s 
+
+<img src="ingress.png">
+
+
 
