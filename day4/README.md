@@ -140,4 +140,20 @@ b6c2a8d6f0ac: Mounted from library/nginx
 571ade696b26: Mounted from library/nginx 
 ```
 
+### best way to build image as per industry standard 
 
+### dockerfile 
+
+```
+ARG arch 
+# use of arg to accept values in variable during build time 
+FROM  --platform=${arch}  nginx
+LABEL name="ashutoshh"
+COPY html-sample-app /usr/share/nginx/html/
+```
+
+### build command 
+
+```
+docker build -t  dockerashu/ashu-oraclewebapp:appv2  --build-arg arch=arm64 --no-cache .
+```
