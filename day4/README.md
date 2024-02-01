@@ -327,3 +327,246 @@ ashulb1   LoadBalancer   10.0.198.148   20.235.194.19   1234:31248/TCP   15m
 [ashu@ip-172-31-29-23 k8s-manifest]$ 
 ```
 
+### chekcing all the service 
+
+```
+ashu@ip-172-31-29-23 k8s-manifest]$ kubectl  get  svc
+NAME      TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)   AGE
+ashulb1   ClusterIP   10.0.198.148   <none>        80/TCP    27m
+[ashu@ip-172-31-29-23 k8s-manifest]$ kubectl   get  svc --all-namespaces
+NAMESPACE       NAME                              TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)         AGE
+ashu-apps       ashulb1                           ClusterIP   10.0.198.148   <none>        80/TCP          31m
+calico-system   calico-kube-controllers-metrics   ClusterIP   None           <none>        9094/TCP        164m
+calico-system   calico-typha                      ClusterIP   10.0.152.45    <none>        5473/TCP        165m
+default         anantlb2                          ClusterIP   10.0.171.20    <none>        80/TCP          29m
+default         kubernetes                        ClusterIP   10.0.0.1       <none>        443/TCP         167m
+default         rachlb1                           ClusterIP   10.0.195.193   <none>        1234/TCP        25m
+dhara-ns        intl-lb-1                         ClusterIP   10.0.45.143    <none>        80/TCP          30m
+kube-system     ama-metrics-ksm                   ClusterIP   10.0.82.215    <none>        8080/TCP        158m
+kube-system     kube-dns                          ClusterIP   10.0.0.10      <none>        53/UDP,53/TCP   166m
+kube-system     metrics-server                    ClusterIP   10.0.164.120   <none>        443/TCP         166m
+parag-apps      paraglb1                          ClusterIP   10.0.12.111    <none>        1234/TCP        20m
+pras-apps       praslb1                           ClusterIP   10.0.173.134   <none>        80/TCP          29m
+sandhya-ns      sandhyalb1                        ClusterIP   10.0.96.32     <none>        7645/TCP        5m22s
+sunilwork       sunil                             ClusterIP   10.0.208.161   <none>        1234/TCP        30m
+vishal-proj     ashulb1                           ClusterIP   10.0.160.162   <none>        80/TCP          24m
+[ashu@ip-172-31-29-23 k8s-manifest]$ 
+
+```
+
+### k8s controllers 
+
+<img src="controller.png">
+
+### cleaning current namespace resources 
+
+```
+ashu@ip-172-31-29-23 k8s-manifest]$ kubectl delete pod,svc  --all
+pod "ashupod1" deleted
+service "ashulb1" deleted
+[ashu@ip-172-31-29-23 k8s-manifest]$ kubectl  get po 
+No resources found in ashu-apps namespace.
+[ashu@ip-172-31-29-23 k8s-manifest]$ kubectl  get svc
+No resources found in ashu-apps namespace.
+[ashu@ip-172-31-29-23 k8s-manifest]$ 
+
+```
+
+### APiVersion for deployment controller
+
+<img src="version.png">
+
+### Creating deployment manifest 
+
+```
+kubectl  create  deployment  ashu-app-deploy --image=dockerashu/ashu-oraclewebapp:linuxamdv1   --port 80  --dry-run=client -o yaml 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashu-app-deploy
+  name: ashu-app-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ashu-app-deploy
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: ashu-app-deploy
+    spec:
+      containers:
+      - image: dockerashu/ashu-oraclewebapp:linuxamdv1
+        name: ashu-oraclewebapp
+        ports:
+        - containerPort: 80
+        resources: {}
+status: {}
+[ashu@ip-172-31-29-23 k8s-manifest]$ kubectl  create  deployment  ashu-app-deploy --image=dockerashu/ashu-oraclewebapp:linuxamdv1   --port 80  --dry-run=client -o yaml   >deploy.yaml 
+```
+
+### explained version of yaml 
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashu-app-deploy
+  name: ashu-app-deploy # name of deployment 
+spec:
+  replicas: 1 # default number of pods 
+  selector:
+    matchLabels:
+      app: ashu-app-deploy
+  strategy: {}
+  template: # for pod info 
+    metadata:
+      creationTimestamp: null
+      labels: # label of pods 
+        app: ashu-app-deploy
+    spec:
+      containers: # containers of pod 
+      - image: dockerashu/ashu-oraclewebapp:linuxamdv1
+        name: ashu-oraclewebapp
+        ports:
+        - containerPort: 80
+        resources: {}
+status: {}
+
+```
+
+### Creating 
+
+```
+kubectl  create  -f deploy.yaml 
+deployment.apps/ashu-app-deploy created
+[ashu@ip-172-31-29-23 k8s-manifest]$ kubectl   get  deployment 
+NAME              READY   UP-TO-DATE   AVAILABLE   AGE
+ashu-app-deploy   1/1     1            1           5s
+[ashu@ip-172-31-29-23 k8s-manifest]$ kubectl   get  deploy
+NAME              READY   UP-TO-DATE   AVAILABLE   AGE
+ashu-app-deploy   1/1     1            1           9s
+[ashu@ip-172-31-29-23 k8s-manifest]$ kubectl  get  pods
+NAME                               READY   STATUS    RESTARTS   AGE
+ashu-app-deploy-5d7f9d99c8-g79w9   1/1     Running   0          18s
+[ashu@ip-172-31-29-23 k8s-manifest]$ 
+
+```
+
+### scaling pod horizentally 
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashu-app-deploy
+  name: ashu-app-deploy # name of deployment 
+spec:
+  replicas: 3 # default number of pods 
+  selector:
+    matchLabels:
+      app: ashu-app-deploy
+  strategy: {}
+  template: # for pod info 
+    metadata:
+      creationTimestamp: null
+      labels: # label of pods 
+        app: ashu-app-deploy
+    spec:
+      containers: # containers of pod 
+      - image: dockerashu/ashu-oraclewebapp:linuxamdv1
+        name: ashu-oraclewebapp
+        ports:
+        - containerPort: 80
+        resources: {}
+status: {}
+
+
+====>>
+ashu@ip-172-31-29-23 k8s-manifest]$ kubectl apply -f deploy.yaml 
+Warning: resource deployments/ashu-app-deploy is missing the kubectl.kubernetes.io/last-applied-configuration annotation which is required by kubectl apply. kubectl apply should only be used on resources created declaratively by either kubectl create --save-config or kubectl apply. The missing annotation will be patched automatically.
+deployment.apps/ashu-app-deploy configured
+[ashu@ip-172-31-29-23 k8s-manifest]$ kubectl  get  pods
+NAME                               READY   STATUS    RESTARTS   AGE
+ashu-app-deploy-5d7f9d99c8-29cm6   1/1     Running   0          5s
+ashu-app-deploy-5d7f9d99c8-bj5dj   1/1     Running   0          75s
+ashu-app-deploy-5d7f9d99c8-hk9f4   1/1     Running   0          5s
+[ashu@ip-172-31-29-23 k8s-manifest]$ kubectl  get  po -o wide
+NAME                               READY   STATUS    RESTARTS   AGE   IP            NODE                                NOMINATED NODE   READINESS GATES
+ashu-app-deploy-5d7f9d99c8-29cm6   1/1     Running   0          17s   10.244.0.33   aks-agentpool-31845344-vmss000001   <none>           <none>
+ashu-app-deploy-5d7f9d99c8-bj5dj   1/1     Running   0          87s   10.244.0.29   aks-agentpool-31845344-vmss000001   <none>           <none>
+ashu-app-deploy-5d7f9d99c8-hk9f4   1/1     Running   0          17s   10.244.1.22
+```
+
+### scale pod without changing in manifest file 
+
+```
+shu@ip-172-31-29-23 k8s-manifest]$ kubectl  get  deploy 
+NAME              READY   UP-TO-DATE   AVAILABLE   AGE
+ashu-app-deploy   1/1     1            1           8m47s
+[ashu@ip-172-31-29-23 k8s-manifest]$ kubectl   get po
+NAME                               READY   STATUS    RESTARTS   AGE
+ashu-app-deploy-5d7f9d99c8-hk9f4   1/1     Running   0          2m25s
+[ashu@ip-172-31-29-23 k8s-manifest]$ 
+[ashu@ip-172-31-29-23 k8s-manifest]$ 
+[ashu@ip-172-31-29-23 k8s-manifest]$ kubectl  scale  deployment  ashu-app-deploy  --replicas=4
+deployment.apps/ashu-app-deploy scaled
+[ashu@ip-172-31-29-23 k8s-manifest]$ kubectl  get  po 
+NAME                               READY   STATUS    RESTARTS   AGE
+ashu-app-deploy-5d7f9d99c8-69rz9   1/1     Running   0          15s
+ashu-app-deploy-5d7f9d99c8-8b8jz   1/1     Running   0          15s
+ashu-app-deploy-5d7f9d99c8-hk9f4   1/1     Running   0          3m26s
+ashu-app-deploy-5d7f9d99c8-hpbkk   1/1     Running   0          15s
+[ashu@ip-172-31-29-23 k8s-manifest]$ 
+
+```
+
+### creating service using expose command 
+
+```
+[ashu@ip-172-31-29-23 k8s-manifest]$ kubectl  get  deploy
+NAME              READY   UP-TO-DATE   AVAILABLE   AGE
+ashu-app-deploy   4/4     4            4           12m
+[ashu@ip-172-31-29-23 k8s-manifest]$ 
+[ashu@ip-172-31-29-23 k8s-manifest]$ 
+[ashu@ip-172-31-29-23 k8s-manifest]$ kubectl  expose deployment  ashu-app-deploy  --type ClusterIP --port 80 --name ashulb2 --dry-run=client -o yaml 
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashu-app-deploy
+  name: ashulb2
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: ashu-app-deploy
+  type: ClusterIP
+status:
+  loadBalancer: {}
+[ashu@ip-172-31-29-23 k8s-manifest]$ kubectl  expose deployment  ashu-app-deploy  --type ClusterIP --port 80 --name ashulb2 --dry-run=client -o yaml   >newsvc.yaml
+[ashu@ip-172-31-29-23 k8s-manifest]$ kubectl  create -f newsvc.yaml 
+service/ashulb2 created
+[ashu@ip-172-31-29-23 k8s-manifest]$ 
+[ashu@ip-172-31-29-23 k8s-manifest]$ 
+[ashu@ip-172-31-29-23 k8s-manifest]$ kubectl  get  svc
+NAME      TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)   AGE
+ashulb2   ClusterIP   10.0.152.17   <none>        80/TCP    4s
+[ashu@ip-172-31-29-23 k8s-manifest]$ 
+[ashu@ip-172-31-29-23 k8s-manifest]$ 
+[ashu@ip-172-31-29-23 k8s-manifest]$ kubectl  get  ep 
+NAME      ENDPOINTS                                                  AGE
+ashulb2   10.244.0.40:80,10.244.1.22:80,10.244.1.29:80 + 1 more...   9s
+[ashu@ip-172-31-29-23 k8s-manifest]$ 
+```
