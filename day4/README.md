@@ -157,3 +157,32 @@ COPY html-sample-app /usr/share/nginx/html/
 ```
 docker build -t  dockerashu/ashu-oraclewebapp:appv2  --build-arg arch=arm64 --no-cache .
 ```
+
+### Deploying pod from docker hub amd based image
+
+```
+ashu@ip-172-31-29-23 docker-images]$ cd ../k8s-manifest/
+[ashu@ip-172-31-29-23 k8s-manifest]$ ls
+[ashu@ip-172-31-29-23 k8s-manifest]$ kubectl run ashupod1 --image=dockerashu/ashu-oraclewebapp:linuxamdv1 --port 80 --dry-run=client  -o yaml >podweb.yaml 
+[ashu@ip-172-31-29-23 k8s-manifest]$ kubectl create -f podweb.yaml 
+pod/ashupod1 created
+[ashu@ip-172-31-29-23 k8s-manifest]$ kubectl  get  pods
+NAME       READY   STATUS    RESTARTS   AGE
+ashupod1   1/1     Running   0          8s
+[ashu@ip-172-31-29-23 k8s-manifest]$ 
+
+```
+
+
+### CNi network traffic distribution 
+
+<img src="cni1.png">
+
+### internal Loadbalancer will be using service discovery to find all the pods of same app
+
+<img src="svc1.png">
+
+### internal LB will be finding relevent pod ip using label concept 
+
+<img src="lb1.png">
+
