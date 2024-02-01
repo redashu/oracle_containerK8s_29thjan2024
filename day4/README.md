@@ -570,3 +570,141 @@ NAME      ENDPOINTS                                                  AGE
 ashulb2   10.244.0.40:80,10.244.1.22:80,10.244.1.29:80 + 1 more...   9s
 [ashu@ip-172-31-29-23 k8s-manifest]$ 
 ```
+
+### private image can't be deploy by k8s 
+
+```
+[ashu@ip-172-31-29-23 k8s-manifest]$ kubectl  create  deployment ashu-private  --image=ashuoracle.azurecr.io/oracle:appv1  --port 80  --dry-run=client -o yaml >azure_deploy.yaml 
+[ashu@ip-172-31-29-23 k8s-manifest]$ kubectl  create -f azure_deploy.yaml 
+deployment.apps/ashu-private created
+[ashu@ip-172-31-29-23 k8s-manifest]$ kubectl  get  deploy
+NAME              READY   UP-TO-DATE   AVAILABLE   AGE
+ashu-app-deploy   2/2     2            2           138m
+ashu-private      0/1     1            0           4s
+[ashu@ip-172-31-29-23 k8s-manifest]$ kubectl  get  po 
+NAME                               READY   STATUS         RESTARTS   AGE
+ashu-app-deploy-5d7f9d99c8-8b8jz   1/1     Running        0          129m
+ashu-app-deploy-5d7f9d99c8-hk9f4   1/1     Running        0          132m
+ashu-private-689bb649b7-tlksb      0/1     ErrImagePull   0          13s
+[ashu@ip-172-31-29-23 k8s-manifest]$ 
+```
+
+### Introduction to Secret in k8s 
+
+<img src="secret.png">
+
+### Creating secret 
+
+```
+kubectl create secret docker-registry  ashu-cred-reg  --docker-server ashuoracle.azurecr.io  --docker-username ashuoracle   --docker-password="Xn"  --dry-run=client -o yaml >azure_secret.yaml
+
+ashu@ip-172-31-29-23 k8s-manifest]$ kubectl  create -f azure_secret.yaml 
+secret/ashu-cred-reg created
+[ashu@ip-172-31-29-23 k8s-manifest]$ 
+[ashu@ip-172-31-29-23 k8s-manifest]$ 
+[ashu@ip-172-31-29-23 k8s-manifest]$ kubectl  get secrets 
+NAME            TYPE                             DATA   AGE
+ashu-cred-reg   kubernetes.io/dockerconfigjson   1      5s
+
+
+```
+
+### using private image
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashu-private
+  name: ashu-private
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ashu-private
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: ashu-private
+    spec:
+      imagePullSecrets: # using secret 
+      - name: ashu-cred-reg # name of secret 
+      containers:
+      - image:  ashuoracle.azurecr.io/oraclenew:version10
+        name: oracle
+        ports:
+        - containerPort: 80
+        resources: {}
+status: {}
+
+```
+
+### Creating secret for storing db password
+
+```
+ashu@ip-172-31-29-23 k8s-manifest]$ kubectl create secret  generic ashu-dbpass --from-literal pass1=Hellodb@123  --dry-run=client   -o yaml >dbsecret.yaml
+[ashu@ip-172-31-29-23 k8s-manifest]$ kubectl create -f dbsecret.yaml 
+secret/ashu-dbpass created
+[ashu@ip-172-31-29-23 k8s-manifest]$ kubectl  get  secret
+NAME            TYPE                             DATA   AGE
+ashu-cred-reg   kubernetes.io/dockerconfigjson   1      53m
+ashu-dbpass     Opaque                           1      5s
+[ashu@ip-172-31-29-23 k8s-manifest]$ 
+```
+
+### mysql deployment.yaml 
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashu-db
+  name: ashu-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ashu-db
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: ashu-db
+    spec:
+      imagePullSecrets:
+      - name: ashu-cred-reg
+      containers:
+      - image: ashuoracle.azurecr.io/mysql:amd64
+        name: mysql
+        env: 
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: ashu-dbpass
+              key: pass1 
+        resources: {}
+status: {}
+
+```
+####
+
+```
+[ashu@ip-172-31-29-23 k8s-manifest]$ kubectl create -f mysql.yaml 
+deployment.apps/ashu-db created
+[ashu@ip-172-31-29-23 k8s-manifest]$ kubectl  get deploy
+NAME      READY   UP-TO-DATE   AVAILABLE   AGE
+ashu-db   1/1     1            1           5s
+[ashu@ip-172-31-29-23 k8s-manifest]$ kubectl  get po 
+NAME                       READY   STATUS    RESTARTS   AGE
+ashu-db-775459667f-hpcvg   1/1     Running   0          8s
+[ashu@ip-172-31-29-23 k8s-manifest]$ 
+
+
+```
