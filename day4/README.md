@@ -708,3 +708,53 @@ ashu-db-775459667f-hpcvg   1/1     Running   0          8s
 
 
 ```
+
+### Creating two tier app 
+
+### mysql:8.0 image
+
+```
+# creating secret to store db creds
+apiVersion: v1
+data:
+  MYSQL_PASSWORD: T2tleUAxMjM=
+  MYSQL_ROOT_PASSWORD: SGVsbG9yb290QDA5OA==
+  MYSQL_USER: YXNodQ==
+kind: Secret
+metadata:
+  creationTimestamp: null
+  name: ashu-app-db
+# deployment manifest
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashu-mysqldb
+  name: ashu-mysqldb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ashu-mysqldb
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: ashu-mysqldb
+    spec:
+      containers:
+      - image: mysql:8.0
+        name: mysql
+        ports:
+        - containerPort: 3306
+        envFrom: # calling secret info 
+        - secretRef: 
+            name: ashu-app-db
+        resources: {}
+status: {}
+```
+
+
