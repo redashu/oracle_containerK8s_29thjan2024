@@ -1,7 +1,0 @@
-apiVersion: v1
-data:
-  dbconn: db-lb
-kind: ConfigMap
-metadata:
-  creationTimestamp: null
-  name: ashu-app-connect
