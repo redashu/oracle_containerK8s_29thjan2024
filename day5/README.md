@@ -160,3 +160,29 @@ ashu-web-6d69b75dd8-tvpgn       1/1     Running   0          19s
 [ashu@ip-172-31-29-23 twotapp]$ 
 ```
 
+### Creating new web deployment 
+
+```
+ kubectl  create deployment  d1 --image=adminer  --port 8080 
+```
+### Creating svc of web 
+
+```
+[ashu@ip-172-31-29-23 twotapp]$ kubectl  get  deploy
+NAME           READY   UP-TO-DATE   AVAILABLE   AGE
+ashu-mysqldb   1/1     1            1           18h
+d1             1/1     1            1           4m3s
+[ashu@ip-172-31-29-23 twotapp]$ kubectl  get  svc
+NAME    TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
+db-lb   ClusterIP   10.0.111.196   <none>        3306/TCP   18h
+[ashu@ip-172-31-29-23 twotapp]$ 
+[ashu@ip-172-31-29-23 twotapp]$ 
+[ashu@ip-172-31-29-23 twotapp]$ kubectl expose deployment d1  --type ClusterIP --port 8080 --name ashuweblb --dry-run=client -o yaml >websvc.yaml 
+[ashu@ip-172-31-29-23 twotapp]$ kubectl  create -f websvc.yaml 
+service/ashuweblb created
+[ashu@ip-172-31-29-23 twotapp]$ kubectl  get  svc
+NAME        TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
+ashuweblb   ClusterIP   10.0.51.60     <none>        8080/TCP   5s
+db-lb       ClusterIP   10.0.111.196   <none>        3306/TCP   18h
+[ashu@ip-172-31-29-23 twotapp]$ 
+```
