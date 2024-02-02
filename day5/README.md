@@ -1,1 +1,8 @@
-# oracle_containerK8s_29thjan2024
+
+### REvision 
+<img src="rev.png">
+
+### Application access using Ingress controller 
+
+<img src="ing.png">
+
