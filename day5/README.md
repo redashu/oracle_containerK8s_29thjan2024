@@ -294,5 +294,61 @@ NAME                          READY   STATUS    RESTARTS   AGE
 ashu-hpaweb-569d754b5-4cg9f   1/1     Running   0          4m17s
 ```
 
+### Storage in K8s 
+
+<img src="st1.png">
+
+### Creating storage pod yaml 
+
+```
+kubectl  run ashu-storage  --image=alpine --dry-run=client -o yaml >volumedemo1.yaml 
+```
+
+### adding hostpath volume type in pod 
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: ashu-storage
+  name: ashu-storage
+spec:
+  volumes: # for creating volumes 
+  - name: ashuvol1 
+    hostPath: # taking storage from the Node where pod got schedule
+      path: /data/ashutoshh
+      type: DirectoryOrCreate # if above location is not present then it will becreated
+  containers: # for creating containers 
+  - image: alpine
+    name: ashu-storage
+    command: ["sh","-c","while true;do echo hello `date +%T` >>/mnt/ashu/time.txt;sleep 10;done"]
+    resources: {}
+    volumeMounts: # to attach storage 
+    - name: ashuvol1
+      mountPath: /mnt/ashu/
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+
+
+```
+
+###
+
+```
+[ashu@ip-172-31-29-23 k8s-manifest]$ kubectl  exec -it ashu-storage -- sh 
+/ # cat  //mnt/ashu/time.txt 
+hello 09:20:06
+hello 09:20:16
+hello 09:20:26
+hello 09:20:36
+hello 09:20:46
+```
+
+
+
+
 
 
