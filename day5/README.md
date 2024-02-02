@@ -348,6 +348,50 @@ hello 09:20:46
 ```
 
 
+### Storage in Deployment manifest 
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: ashu-mysqldb
+  name: ashu-mysqldb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ashu-mysqldb
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: ashu-mysqldb
+    spec:
+      volumes:
+      - name: ashudbvol1
+        hostPath:
+          path: /data/ashutoshhDb
+          type: DirectoryOrCreate 
+      containers:
+      - image: mysql:8.0
+        name: mysql
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+        - name: ashudbvol1 
+          mountPath: /var/lib/mysql/
+        envFrom: # calling secret info 
+        - secretRef: 
+            name: ashu-app-db
+        resources: 
+          limits: 
+            memory: 1G
+            cpu: 500m 
+status: {}
+```
 
 
 
