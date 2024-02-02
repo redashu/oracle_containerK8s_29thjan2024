@@ -186,3 +186,83 @@ ashuweblb   ClusterIP   10.0.51.60     <none>        8080/TCP   5s
 db-lb       ClusterIP   10.0.111.196   <none>        3306/TCP   18h
 [ashu@ip-172-31-29-23 twotapp]$ 
 ```
+
+### Deploy nginx ingress controller in k8s 
+
+```
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.2/deploy/static/provider/cloud/deploy.yaml
+namespace/ingress-nginx created
+serviceaccount/ingress-nginx created
+serviceaccount/ingress-nginx-admission created
+role.rbac.authorization.k8s.io/ingress-nginx created
+role.rbac.authorization.k8s.io/ingress-nginx-admission created
+clusterrole.rbac.authorization.k8s.io/ingress-nginx created
+clusterrole.rbac.authorization.k8s.io/ingress-nginx-admission created
+rolebinding.rbac.authorization.k8s.io/ingress-nginx created
+
+```
+
+### Official Docs for nginx ingress controller 
+
+[click_here](https://kubernetes.github.io/ingress-nginx/deploy/)
+
+### Verify installation of Nginx ingress controller 
+
+```
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ashu-app-rule-ingress # name of routing rule 
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx # class is nginx 
+  rules:
+  - host: ashuapp.adhocnet.org  # my app host name 
+    http:
+      paths:
+      - path: / # app path which is home page 
+        pathType: Prefix
+        backend:
+          service:
+            name: ashuweblb # name of webapp svc 
+            port:
+              number: 8080 # port of webapp svc 
+```
+
+### Creating 
+
+```
+[ashu@ip-172-31-29-23 twotapp]$ kubectl create -f web-ingress.yaml 
+ingress.networking.k8s.io/ashu-app-rule-ingress created
+[ashu@ip-172-31-29-23 twotapp]$ kubectl  get ingress 
+NAME                    CLASS   HOSTS                  ADDRESS   PORTS   AGE
+ashu-app-rule-ingress   nginx   ashuapp.adhocnet.org             80      5s
+[ashu@ip-172-31-29-23 twotapp]$ 
+
+
+```
+
+### list of Resources in k8s 
+
+```
+[ashu@ip-172-31-29-23 ~]$ kubectl api-resources 
+NAME                                SHORTNAMES          APIVERSION                             NAMESPACED   KIND
+bindings                                                v1                                     true         Binding
+componentstatuses                   cs                  v1                                     false        ComponentStatus
+configmaps                          cm                  v1                                     true         ConfigMap
+endpoints                           ep                  v1                                     true         Endpoints
+events                              ev                  v1                                     true         Event
+limitranges                         limits              v1                                     true         LimitRange
+namespaces                          ns                  v1                                     false        Namespace
+nodes                               no                  v1                                     false        Node
+persistentvolumeclaims              pvc                 v1                                     true         PersistentVolumeClaim
+persistentvolumes                   pv                  v1                                     false        PersistentVolume
+pods                                po                  v1                                     true         Pod
+
+```
+
+
+
+
+
